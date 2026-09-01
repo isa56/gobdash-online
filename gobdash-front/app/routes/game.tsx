@@ -7,6 +7,7 @@ import DraggableCard from '~/components/DraggableCard';
 import ActionSlot, { ACTION_SLOT_ID } from '~/components/ActionSlot';
 import Card from '~/components/Card';
 import LoadingSpinner from '~/components/LoadingSpinner';
+import PlayerHand from '~/components/PlayerHand';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -96,25 +97,7 @@ export default function Game() {
       </div>
 
       {/* Player hand */}
-      <div className='flex flex-col gap-2'>
-        <p className='text-sm font-semibold uppercase tracking-widest text-stone-400'>
-          Hand
-        </p>
-        <div className='flex gap-4'>
-          {hand.map((card) => (
-            <DraggableCard key={card.id} card={card} />
-          ))}
-        </div>
-      </div>
-
-      {/* Drag overlay - renders the card clone that follows the cursor */}
-      <DragOverlay>
-        {draggingCard ? (
-          <div className='rotate-3 scale-110 drop-shadow-2xl'>
-            <Card card={draggingCard} />
-          </div>
-        ) : null}
-      </DragOverlay>
+      <PlayerHand hand={hand} draggingCard={draggingCard} />
     </DragDropProvider>
   );
 }
