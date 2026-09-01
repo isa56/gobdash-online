@@ -7,17 +7,26 @@
 /* Project theme — overrides Flowbite defaults */
 @theme {
   /* Fonts */
-  --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans:
+    'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --font-text: 'Poppins';
   --font-titles: 'MedievalSharp', ui-serif, system-ui, serif;
   --font-emphasis: 'Special Elite', ui-serif, system-ui, serif;
 
   /* Brand colors */
   --color-sand-dune: #ddd9c2;
+  --color-sand-dune-dark: #d3ceb1;
+  --color-sand-dune-light: #f0efe5;
   --color-sunlit-clay: #cda35a;
+  --color-sunlit-clay-dark: #c59644;
+  --color-sunlit-clay-light: #d9b982;
   --color-espresso: #56231e;
+  --color-espresso-dark: #3c1815;
+  --color-espresso-light: #79312a;
   --color-fern: #4e6e33;
+  --color-fern-dark: #3b5427;
+  --color-fern-light: #628c40;
 }
 
 html,

@@ -18,13 +18,12 @@ function RoomInfo({ roomNumber, numberOfPlayers }: RoomInfoProps) {
   return (
     <>
       <div className='flex flex-col items-center justify-center gap-2 bg-espresso/75 p-4 rounded-sm'>
-        <h1 className='text-2xl font-bold font-emphasis text-sand-dune'>
-          Room:{' '}
-          <span className='text-fern cursor-pointer' onClick={onCopy}>
-            {roomNumber}
-          </span>
+        <h1
+          className='text-2xl font-bold font-emphasis text-sand-dune cursor-pointer'
+          onClick={onCopy}>
+          Room: <span className='text-fern-light'>{roomNumber}</span>
         </h1>
-        <p className='text-sm text-gray-200'>
+        <p className='text-sm text-white'>
           Number of Players: {numberOfPlayers}
         </p>
       </div>
@@ -42,4 +41,3 @@ function RoomInfo({ roomNumber, numberOfPlayers }: RoomInfoProps) {
 }
 
 export default RoomInfo;
-
