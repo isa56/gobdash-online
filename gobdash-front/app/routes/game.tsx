@@ -6,7 +6,7 @@ import type { Card as CardModel } from '~/types/game';
 import DraggableCard from '~/components/DraggableCard';
 import ActionSlot, { ACTION_SLOT_ID } from '~/components/ActionSlot';
 import Card from '~/components/Card';
-import LoadingSpinner from '~/components/LoadingSpinner';
+import LoadingSpinner from '~/components/utils/LoadingSpinner';
 import PlayerHand from '~/components/PlayerHand';
 import RoomInfo from '~/components/RoomInfo';
 
