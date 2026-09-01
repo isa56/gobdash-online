@@ -1,16 +1,19 @@
 @import 'tailwindcss';
-@import 'flowbite/src/themes/default';
 
+/* Flowbite v4: theme tokens + component plugin */
+@import 'flowbite/src/themes/default';
 @plugin "flowbite/plugin";
 
+/* Project theme — overrides Flowbite defaults */
 @theme {
-  --font-sans:
-    'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  /* Fonts */
+  --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --font-text: 'Poppins';
   --font-titles: 'MedievalSharp', ui-serif, system-ui, serif;
   --font-emphasis: 'Special Elite', ui-serif, system-ui, serif;
 
+  /* Brand colors */
   --color-sand-dune: #ddd9c2;
   --color-sunlit-clay: #cda35a;
   --color-espresso: #56231e;

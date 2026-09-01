@@ -12,6 +12,8 @@
     "@dnd-kit/react": "^0.5.0",
     "@react-router/node": "^8",
     "@react-router/serve": "^8",
+    "flowbite": "^4.0.2",
+    "flowbite-react": "^0.12.17",
     "isbot": "^5.1.36",
     "motion": "^13.1.1",
     "react": "^19.2.7",
