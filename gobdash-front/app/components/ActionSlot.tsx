@@ -17,7 +17,7 @@ export default function ActionSlot({ playedCard, onClear }: ActionSlotProps) {
       ref={ref}
       className={[
         // Size matches the card
-        'flex w-36 min-h-48 h-full items-center justify-center rounded-xl',
+        'flex w-38 min-h-56 h-full items-center justify-center rounded-xl',
         // Dashed border drop zone
         'border-2 border-dashed transition-all duration-150',
         // Highlight when hovered during drag
@@ -26,7 +26,7 @@ export default function ActionSlot({ playedCard, onClear }: ActionSlotProps) {
           : 'border-stone-400 bg-stone-800/20',
       ].join(' ')}>
       {playedCard ? (
-        <div className='relative h-full w-full'>
+        <div className='relative h-full w-full flex  items-center justify-center'>
           <Card card={playedCard} />
           {onClear && (
             <button
@@ -39,7 +39,7 @@ export default function ActionSlot({ playedCard, onClear }: ActionSlotProps) {
           )}
         </div>
       ) : (
-        <span className='select-none text-sm text-stone-400'>
+        <span className='select-none text-sm text-stone-400 items-center justify-center'>
           {isDropTarget ? 'Release to play' : 'Drop card here'}
         </span>
       )}

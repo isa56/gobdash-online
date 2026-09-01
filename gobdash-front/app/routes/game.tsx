@@ -6,6 +6,7 @@ import type { Card as CardModel } from '~/types/game';
 import DraggableCard from '~/components/DraggableCard';
 import ActionSlot, { ACTION_SLOT_ID } from '~/components/ActionSlot';
 import Card from '~/components/Card';
+import LoadingSpinner from '~/components/LoadingSpinner';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -49,12 +50,19 @@ export default function Game() {
     }
   }
 
-  if (!mounted) return null;
+  if (!mounted) {
+    return (
+      <>
+        <LoadingSpinner />
+      </>
+    );
+  }
 
   return (
     <DragDropProvider
       onDragStart={(event) => {
-        const card = event.operation.source?.data?.card as CardModel | undefined;
+        const card = event.operation.source?.data?.card as
+          CardModel | undefined;
         setDraggingCard(card ?? null);
       }}
       onDragEnd={(event) => {
@@ -65,7 +73,8 @@ export default function Game() {
         const droppedOnSlot = event.operation.target?.id === ACTION_SLOT_ID;
         if (!droppedOnSlot) return;
 
-        const card = event.operation.source?.data?.card as CardModel | undefined;
+        const card = event.operation.source?.data?.card as
+          CardModel | undefined;
         if (!card) return;
 
         // If there was already a played card, return it to the hand first
@@ -74,25 +83,24 @@ export default function Game() {
           return playedCard ? [...next, playedCard] : next;
         });
         setPlayedCard(card);
-      }}
-    >
+      }}>
       <h1>Room: {roomId}</h1>
       <p>Number of Players: {numberOfPlayers}</p>
 
       {/* Action slot - drop target */}
-      <div className="mb-8">
-        <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-stone-400">
+      <div className='mt-8 mb-8'>
+        <p className='mb-2 text-sm text-center font-semibold uppercase tracking-widest text-stone-400'>
           Your Action
         </p>
         <ActionSlot playedCard={playedCard} onClear={handleClearSlot} />
       </div>
 
       {/* Player hand */}
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-semibold uppercase tracking-widest text-stone-400">
+      <div className='flex flex-col gap-2'>
+        <p className='text-sm font-semibold uppercase tracking-widest text-stone-400'>
           Hand
         </p>
-        <div className="flex gap-4">
+        <div className='flex gap-4'>
           {hand.map((card) => (
             <DraggableCard key={card.id} card={card} />
           ))}
@@ -102,7 +110,7 @@ export default function Game() {
       {/* Drag overlay - renders the card clone that follows the cursor */}
       <DragOverlay>
         {draggingCard ? (
-          <div className="rotate-3 scale-110 drop-shadow-2xl">
+          <div className='rotate-3 scale-110 drop-shadow-2xl'>
             <Card card={draggingCard} />
           </div>
         ) : null}
@@ -110,3 +118,4 @@ export default function Game() {
     </DragDropProvider>
   );
 }
+
