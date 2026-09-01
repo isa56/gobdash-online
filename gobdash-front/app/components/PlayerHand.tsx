@@ -11,11 +11,11 @@ interface PlayerHandProps {
 function PlayerHand({ hand, draggingCard }: PlayerHandProps) {
   return (
     <>
-      <div className='flex flex-col gap-2'>
+      <div className='flex flex-col gap-2 w-full items-center mb-4'>
         <p className='text-sm font-semibold uppercase tracking-widest text-stone-400'>
           Hand
         </p>
-        <div className='flex gap-4'>
+        <div className='flex items-center justify-center w-full gap-4'>
           {hand
             ? hand.map((card, index) => {
                 const angle = (index - (hand.length - 1) / 2) * 4.5; // Adjust the multiplier for more or less rotation

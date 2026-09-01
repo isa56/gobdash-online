@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
 import type { Route } from './+types/home';
 import { deckOfCards } from '~/types/constants';
@@ -61,7 +61,7 @@ export default function Game() {
   }
 
   return (
-    <div className='flex flex-col items-center justify-center gap-4 pb-2 w-screen h-full'>
+    <div className='flex flex-col items-center justify-center gap-4 w-full h-full pb-8'>
       <DragDropProvider
         onDragStart={(event) => {
           const card = event.operation.source?.data?.card as
