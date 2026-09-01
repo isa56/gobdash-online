@@ -8,6 +8,7 @@ import ActionSlot, { ACTION_SLOT_ID } from '~/components/ActionSlot';
 import Card from '~/components/Card';
 import LoadingSpinner from '~/components/LoadingSpinner';
 import PlayerHand from '~/components/PlayerHand';
+import RoomInfo from '~/components/RoomInfo';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -60,45 +61,53 @@ export default function Game() {
   }
 
   return (
-    <DragDropProvider
-      onDragStart={(event) => {
-        const card = event.operation.source?.data?.card as
-          CardModel | undefined;
-        setDraggingCard(card ?? null);
-      }}
-      onDragEnd={(event) => {
-        setDraggingCard(null);
+    <div className='flex flex-col items-center justify-center gap-4 pb-2 w-screen h-full'>
+      <DragDropProvider
+        onDragStart={(event) => {
+          const card = event.operation.source?.data?.card as
+            CardModel | undefined;
+          setDraggingCard(card ?? null);
+        }}
+        onDragEnd={(event) => {
+          setDraggingCard(null);
 
-        if (event.canceled) return;
+          if (event.canceled) return;
 
-        const droppedOnSlot = event.operation.target?.id === ACTION_SLOT_ID;
-        if (!droppedOnSlot) return;
+          const droppedOnSlot = event.operation.target?.id === ACTION_SLOT_ID;
+          if (!droppedOnSlot) return;
 
-        const card = event.operation.source?.data?.card as
-          CardModel | undefined;
-        if (!card) return;
+          const card = event.operation.source?.data?.card as
+            CardModel | undefined;
+          if (!card) return;
 
-        // If there was already a played card, return it to the hand first
-        setHand((prev) => {
-          const next = prev.filter((c) => c.id !== card.id);
-          return playedCard ? [...next, playedCard] : next;
-        });
-        setPlayedCard(card);
-      }}>
-      <h1>Room: {roomId}</h1>
-      <p>Number of Players: {numberOfPlayers}</p>
+          // If there was already a played card, return it to the hand first
+          setHand((prev) => {
+            const next = prev.filter((c) => c.id !== card.id);
+            return playedCard ? [...next, playedCard] : next;
+          });
+          setPlayedCard(card);
+        }}>
 
-      {/* Action slot - drop target */}
-      <div className='mt-8 mb-8'>
-        <p className='mb-2 text-sm text-center font-semibold uppercase tracking-widest text-stone-400'>
-          Your Action
-        </p>
-        <ActionSlot playedCard={playedCard} onClear={handleClearSlot} />
-      </div>
+        {/* Room Information */}
+        <div className='flex flex-col items-end justify-end w-full'>
+          <RoomInfo
+            roomNumber={parseInt(roomId)}
+            numberOfPlayers={numberOfPlayers}
+          />
+        </div>
 
-      {/* Player hand */}
-      <PlayerHand hand={hand} draggingCard={draggingCard} />
-    </DragDropProvider>
+        {/* Action slot - drop target */}
+        <div className='mt-8 mb-8'>
+          <p className='mb-2 text-sm text-center font-semibold uppercase tracking-widest text-stone-400'>
+            Your Action
+          </p>
+          <ActionSlot playedCard={playedCard} onClear={handleClearSlot} />
+        </div>
+
+        {/* Player hand */}
+        <PlayerHand hand={hand} draggingCard={draggingCard} />
+      </DragDropProvider>
+    </div>
   );
 }
 

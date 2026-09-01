@@ -1,21 +1,44 @@
 @import 'tailwindcss';
+@import 'flowbite/src/themes/default';
+
+@plugin "flowbite/plugin";
 
 @theme {
   --font-sans:
-    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-text: 'Poppins';
+  --font-titles: 'MedievalSharp', ui-serif, system-ui, serif;
+  --font-emphasis: 'Special Elite', ui-serif, system-ui, serif;
+
+  --color-sand-dune: #ddd9c2;
+  --color-sunlit-clay: #cda35a;
+  --color-espresso: #56231e;
+  --color-fern: #4e6e33;
 }
 
 html,
 body {
-
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   align-items: center;
   justify-content: center;
 
+  .medievalsharp-regular {
+    font-family: 'MedievalSharp', cursive;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .special-elite-regular {
+    font-family: 'Special Elite', system-ui;
+    font-weight: 400;
+    font-style: normal;
+  }
+
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
 }
+
