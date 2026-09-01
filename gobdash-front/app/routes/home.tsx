@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router/internal/react-server-client';
+﻿import { NavLink } from 'react-router';
 import type { Route } from './+types/home';
 
 export function meta({}: Route.MetaArgs) {

@@ -1,4 +1,4 @@
-import { Recipe, Ingredient, PreparationStep } from './game';
+﻿import { Recipe, Ingredient, PreparationStep, Card, CardTypes } from './game';
 
 const water = new Ingredient('Water', false),
   orange = new Ingredient('Orange', false),
@@ -13,6 +13,22 @@ const water = new Ingredient('Water', false),
   carrot_prepared = new Ingredient('Carrot_Prepared', true, 'PREPARED'),
   cheese = new Ingredient('Cheese', false),
   flour = new Ingredient('Flour', false);
+
+const ingredients: Ingredient[] = [
+  water,
+  orange,
+  eggs,
+  eggs_prepared,
+  bread,
+  meat,
+  meat_prepared,
+  potato,
+  potato_prepared,
+  carrot,
+  carrot_prepared,
+  cheese,
+  flour,
+];
 
 const recipes: Recipe[] = [
   new Recipe('Water_Cup', [water]),
@@ -42,3 +58,57 @@ const recipes: Recipe[] = [
     [PreparationStep.COUNTERTOP, PreparationStep.STOVE],
   ),
 ];
+
+const deckOfCards: Card[] = [
+  // go sallon cards:
+  new Card(1, CardTypes.GO_SALON),
+  new Card(2, CardTypes.GO_SALON),
+  new Card(3, CardTypes.GO_SALON),
+  new Card(4, CardTypes.GO_SALON),
+
+  // go stove cards:
+  new Card(5, CardTypes.GO_STOVE),
+  new Card(6, CardTypes.GO_STOVE),
+  new Card(7, CardTypes.GO_STOVE),
+  new Card(8, CardTypes.GO_STOVE),
+
+  // go pantry cards:
+  new Card(9, CardTypes.GO_PANTRY),
+  new Card(10, CardTypes.GO_PANTRY),
+  new Card(11, CardTypes.GO_PANTRY),
+  new Card(12, CardTypes.GO_PANTRY),
+
+  // go countertop cards:
+  new Card(13, CardTypes.GO_COUNTERTOP),
+  new Card(14, CardTypes.GO_COUNTERTOP),
+  new Card(15, CardTypes.GO_COUNTERTOP),
+  new Card(16, CardTypes.GO_COUNTERTOP),
+
+  // prepare cards:
+  new Card(17, CardTypes.PREPARE),
+  new Card(18, CardTypes.PREPARE),
+  new Card(19, CardTypes.PREPARE),
+  new Card(20, CardTypes.PREPARE),
+  new Card(21, CardTypes.PREPARE),
+  new Card(22, CardTypes.PREPARE),
+
+  // get cards:
+  new Card(23, CardTypes.GET),
+  new Card(24, CardTypes.GET),
+  new Card(25, CardTypes.GET),
+  new Card(26, CardTypes.GET),
+  new Card(27, CardTypes.GET),
+  new Card(28, CardTypes.GET),
+
+  // let go cards:
+  new Card(29, CardTypes.LET_GO),
+  new Card(30, CardTypes.LET_GO),
+  new Card(31, CardTypes.LET_GO),
+  new Card(32, CardTypes.LET_GO),
+  new Card(33, CardTypes.LET_GO),
+  new Card(34, CardTypes.LET_GO),
+];
+
+
+export { ingredients, recipes, deckOfCards };
+
