@@ -4,7 +4,6 @@ import { DragDropProvider } from '@dnd-kit/react';
 import type { Route } from './+types/game';
 import type { Card as CardModel } from '~/types/game';
 import { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID } from '~/lib/slots';
-import ActionSlot from '~/components/game/ActionSlot';
 import LoadingSpinner from '~/components/ui/LoadingSpinner';
 import PlayerHand from '~/components/game/PlayerHand';
 import RoomInfo from '~/components/room/RoomInfo';
@@ -12,6 +11,7 @@ import CardTable from '~/components/game/CardTable';
 import CardDeck from '~/components/game/CardDeck';
 import { useGameState } from '~/hooks/useGameState';
 import { useRoom } from '~/hooks/useRoom';
+import PhaseButton from '~/components/game/PhaseButton';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -65,7 +65,8 @@ export default function Game() {
       <DragDropProvider
         onDragStart={(event) => {
           if (turnPhase === 'buy') return; // locked during buy phase
-          const card = event.operation.source?.data?.card as CardModel | undefined;
+          const card = event.operation.source?.data?.card as
+            CardModel | undefined;
           setDraggingCard(card ?? null);
         }}
         onDragEnd={(event) => {
@@ -78,7 +79,8 @@ export default function Game() {
             targetId === DISCARD_SLOT_ID;
           if (!droppedOnSlot || !targetId) return;
 
-          const card = event.operation.source?.data?.card as CardModel | undefined;
+          const card = event.operation.source?.data?.card as
+            CardModel | undefined;
           if (!card) return;
 
           handleDrop(targetId, card);
@@ -124,12 +126,16 @@ export default function Game() {
             onBuyCard={handleSelectBuyFromTable}
           />
 
-          <CardDeck
-            deckCount={deckCount}
-            turnPhase={turnPhase}
-            isSelected={bought?.source === 'deck'}
-            onSelect={handleSelectBuyFromDeck}
-          />
+          <div>
+            <CardDeck
+              deckCount={deckCount}
+              turnPhase={turnPhase}
+              isSelected={bought?.source === 'deck'}
+              onSelect={handleSelectBuyFromDeck}
+            />
+
+            
+          </div>
         </div>
 
         {/* Player hand (includes Discard Pile) */}
@@ -143,27 +149,16 @@ export default function Game() {
           turnPhase={turnPhase}
         />
 
-        {/* Phase-aware action button */}
-        <div className='flex justify-center'>
-          {turnPhase === 'use' ? (
-            <button
-              type='button'
-              disabled={!hasStaged}
-              className='cursor-pointer px-6 py-2 bg-amber-500 text-white font-semibold rounded hover:bg-amber-600 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-amber-500'
-              onClick={handleConfirmUse}>
-              Confirm Use →
-            </button>
-          ) : (
-            <button
-              type='button'
-              disabled={bought === null}
-              className='cursor-pointer px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-500'
-              onClick={handleConfirmBuy}>
-              Confirm Buy ✓
-            </button>
-          )}
-        </div>
+        {/* Phase-aware floating action button */}
+        <PhaseButton
+          turnPhase={turnPhase}
+          hasStaged={hasStaged}
+          handleConfirmUse={handleConfirmUse}
+          handleConfirmBuy={handleConfirmBuy}
+          bought={bought}
+        />
       </DragDropProvider>
     </div>
   );
 }
+

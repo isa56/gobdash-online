@@ -4,8 +4,8 @@ import type { ConnectionStatus, ServerGameStatePayload } from '~/types/server';
 import { deckOfCards } from '~/types/constants';
 import { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID } from '~/lib/slots';
 
-type TurnPhase = 'use' | 'buy';
-type BoughtSelection = { card: Card; source: 'table' | 'deck' } | null;
+export type TurnPhase = 'use' | 'buy';
+export type BoughtSelection = { card: Card; source: 'table' | 'deck' } | null;
 
 interface GameStore {
   // ── Connection ──────────────────────────────────────────────────────────────
