@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import ToastComponent from '../ui/ToastComponent';
-import { BsArrowLeft } from 'react-icons/bs';
+import { BsArrowLeft, BsFillPersonFill } from 'react-icons/bs';
 import { NavLink } from 'react-router';
 
 interface RoomInfoProps {
@@ -9,13 +9,25 @@ interface RoomInfoProps {
   turnNumber: number;
 }
 
-export default function RoomInfo({ roomId, numberOfPlayers, turnNumber }: RoomInfoProps) {
+export default function RoomInfo({
+  roomId,
+  numberOfPlayers,
+  turnNumber,
+}: RoomInfoProps) {
   const [showToast, setShowToast] = useState(false);
 
   function onCopy() {
     navigator.clipboard.writeText(roomId.toString());
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
+  }
+
+  function renderPlayerIcons() {
+    const icons = [];
+    for (let index = 0; index < numberOfPlayers; index++) {
+      icons.push(<BsFillPersonFill size="2em" key={index} />);
+    }
+    return icons;
   }
 
   return (
@@ -25,6 +37,9 @@ export default function RoomInfo({ roomId, numberOfPlayers, turnNumber }: RoomIn
         className='flex text-white ml-4 items-center justify-center gap-2 bg-espresso/75 p-4 rounded-4xl cursor-pointer hover:bg-espresso-dark'>
         <BsArrowLeft />
       </NavLink>
+
+      <div className='flex text-sunlit-clay'>{renderPlayerIcons()}</div>
+
       <div className='flex flex-col items-center justify-center gap-2 bg-espresso/75 p-4 rounded-sm'>
         <h1
           className='text-2xl font-bold font-emphasis text-sand-dune cursor-pointer'
@@ -32,11 +47,9 @@ export default function RoomInfo({ roomId, numberOfPlayers, turnNumber }: RoomIn
           Room: <span className='text-fern-light'>{roomId}</span>
         </h1>
         <p className='text-sm text-white'>
-          Number of Players: {numberOfPlayers}
+          Player {(turnNumber % numberOfPlayers)}'s turn
         </p>
-        <p className='text-sm text-white'>
-          Turn number: {turnNumber}
-        </p>
+        <p className='text-sm text-white'>Turn number: {turnNumber}</p>
       </div>
 
       <div className='fixed bottom-4 right-4 z-50'>
