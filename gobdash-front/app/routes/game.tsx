@@ -4,11 +4,15 @@ import type { Route } from './+types/home';
 import { deckOfCards } from '~/types/constants';
 import type { Card as CardModel } from '~/types/game';
 import DraggableCard from '~/components/DraggableCard';
-import ActionSlot, { ACTION_SLOT_ID } from '~/components/ActionSlot';
-import Card from '~/components/Card';
+import ActionSlot, {
+  ACTION_SLOT_PREFIX,
+  DISCARD_SLOT_ID,
+  makeSlotId,
+} from '~/components/ActionSlot';
 import LoadingSpinner from '~/components/utils/LoadingSpinner';
 import PlayerHand from '~/components/PlayerHand';
 import RoomInfo from '~/components/RoomInfo';
+import CardTable from '~/components/CardTable';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -29,27 +33,66 @@ function shuffle<T>(arr: T[]): T[] {
 
 export default function Game() {
   const roomId = '1234';
-  const numberOfPlayers = 4;
 
   // Start with a deterministic slice so the server and client first-render match.
   // The shuffle happens in useEffect (client-only) to avoid hydration mismatch.
-  const [hand, setHand] = useState<CardModel[]>(deckOfCards.slice(0, 4));
-  const [playedCard, setPlayedCard] = useState<CardModel | null>(null);
+  const [hand, setHand] = useState<CardModel[]>(deckOfCards.dealCards(5));
+  const [cardTableCards, setCardTableCards] = useState<CardModel[]>(
+    deckOfCards.dealCards(5),
+  );
+  const [playedCards, setPlayedCards] = useState<Record<string, CardModel>>({});
   const [draggingCard, setDraggingCard] = useState<CardModel | null>(null);
   const [mounted, setMounted] = useState(false);
 
+  const [turnNumber, setTurnNumber] = useState(1);
+  const [numberOfPlayers, setNumberOfPlayers] = useState(4);
+
   useEffect(() => {
-    // Shuffle the deck and deal a fresh hand on the client only.
-    setHand(shuffle(deckOfCards).slice(0, 5));
+    // Deal a fresh hand on the client only.
+    // setHand(deckOfCards.dealCards(5));
+
+    setCardTableCards(deckOfCards.dealCards(5));
+
     setMounted(true);
   }, []);
 
-  function handleClearSlot() {
-    if (playedCard) {
+  function handleClearSlot(slotId: string) {
+    const card = playedCards[slotId];
+    if (card) {
       // Return the card to the end of the hand
-      setHand((prev) => [...prev, playedCard]);
-      setPlayedCard(null);
+      setHand((prev) => [...prev, card]);
+      setPlayedCards((prev) => {
+        const next = { ...prev };
+        delete next[slotId];
+        return next;
+      });
     }
+  }
+
+  function handleConfirmTurn() {
+    const entries = Object.entries(playedCards);
+    if (entries.length === 0) return; // nothing played — do not advance
+
+    const [slotId, card] = entries[0];
+
+    if (slotId === DISCARD_SLOT_ID) {
+      // Card goes to the discard pile — just remove it from the board
+      setPlayedCards({});
+      setTurnNumber((prev) => prev + 1);
+      return;
+    }
+
+    // Slot ids are "action-slot-N". N is the insertion index into cardTableCards.
+    const slotIndex = parseInt(slotId.replace(`${ACTION_SLOT_PREFIX}-`, ''), 10);
+
+    setCardTableCards((prev) => {
+      const next = [...prev];
+      next.splice(slotIndex, 0, card);
+      return next;
+    });
+
+    setPlayedCards({});
+    setTurnNumber((prev) => prev + 1);
   }
 
   if (!mounted) {
@@ -73,41 +116,55 @@ export default function Game() {
 
           if (event.canceled) return;
 
-          const droppedOnSlot = event.operation.target?.id === ACTION_SLOT_ID;
-          if (!droppedOnSlot) return;
+          const targetId = event.operation.target?.id as string | undefined;
+          const droppedOnSlot =
+            targetId?.startsWith(ACTION_SLOT_PREFIX) ||
+            targetId === DISCARD_SLOT_ID;
+          if (!droppedOnSlot || !targetId) return;
 
           const card = event.operation.source?.data?.card as
             CardModel | undefined;
           if (!card) return;
 
-          // If there was already a played card, return it to the hand first
+          // If there was already a card in this slot, return it to the hand first
+          const existingCard = playedCards[targetId];
           setHand((prev) => {
             const next = prev.filter((c) => c.id !== card.id);
-            return playedCard ? [...next, playedCard] : next;
+            return existingCard ? [...next, existingCard] : next;
           });
-          setPlayedCard(card);
+          setPlayedCards((prev) => ({ ...prev, [targetId]: card }));
         }}>
-
         {/* Room Information */}
         <div className='flex flex-col items-end justify-end w-full'>
           <RoomInfo
             roomNumber={parseInt(roomId)}
             numberOfPlayers={numberOfPlayers}
+            turnNumber={turnNumber}
           />
         </div>
 
         {/* Action slot - drop target */}
         <div className='mt-8 mb-8'>
-          <p className='mb-2 text-sm text-center font-semibold uppercase tracking-widest text-stone-400'>
-            Your Action
-          </p>
-          <ActionSlot playedCard={playedCard} onClear={handleClearSlot} />
+          <CardTable
+            cards={cardTableCards}
+            playedCards={playedCards}
+            onClearSlot={handleClearSlot}
+          />
         </div>
 
         {/* Player hand */}
         <PlayerHand hand={hand} draggingCard={draggingCard} />
+
+        <div className='flex justify-center align-end'>
+          <button
+            type='button'
+            disabled={Object.keys(playedCards).length === 0}
+            className='cursor-pointer px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-500'
+            onClick={handleConfirmTurn}>
+            Confirm Turn
+          </button>
+        </div>
       </DragDropProvider>
     </div>
   );
 }
-

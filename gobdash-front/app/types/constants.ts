@@ -1,4 +1,11 @@
-﻿import { Recipe, Ingredient, PreparationStep, Card, CardTypes } from './game';
+﻿import {
+  Recipe,
+  Ingredient,
+  PreparationStep,
+  Card,
+  CardTypes,
+  DeckOfCards,
+} from './game';
 
 const water = new Ingredient('Water', false),
   orange = new Ingredient('Orange', false),
@@ -59,7 +66,7 @@ const recipes: Recipe[] = [
   ),
 ];
 
-const deckOfCards: Card[] = [
+const originalDeckOfCards: DeckOfCards = new DeckOfCards([
   // go sallon cards:
   new Card(1, CardTypes.GO_SALON),
   new Card(2, CardTypes.GO_SALON),
@@ -107,8 +114,8 @@ const deckOfCards: Card[] = [
   new Card(32, CardTypes.LET_GO),
   new Card(33, CardTypes.LET_GO),
   new Card(34, CardTypes.LET_GO),
-];
+]);
 
+const deckOfCards: DeckOfCards = new DeckOfCards([...originalDeckOfCards.cards]);
 
 export { ingredients, recipes, deckOfCards };
-

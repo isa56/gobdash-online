@@ -125,3 +125,26 @@ export type GameState = {
   myHand: Card[];
   pendingAnimationQueue: ExecutionStep[];
 };
+
+export class DeckOfCards {
+  cards: Card[];
+
+  constructor(cards: Card[]) {
+    this.cards = cards;
+
+    this.shuffle();
+  }
+
+  shuffle(): void {
+    for (let i = this.cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
+    }
+  }
+
+  dealCards(numCards: number): Card[] {
+    const dealtCards = this.cards.slice(0, numCards);
+    this.cards = this.cards.slice(numCards);
+    return dealtCards;
+  }
+}

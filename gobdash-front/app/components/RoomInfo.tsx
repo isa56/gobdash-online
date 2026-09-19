@@ -6,9 +6,10 @@ import { NavLink } from 'react-router';
 interface RoomInfoProps {
   roomNumber: number;
   numberOfPlayers: number;
+  turnNumber: number;
 }
 
-function RoomInfo({ roomNumber, numberOfPlayers }: RoomInfoProps) {
+function RoomInfo({ roomNumber, numberOfPlayers, turnNumber }: RoomInfoProps) {
   const [showToast, setShowToast] = useState(false);
 
   function onCopy() {
@@ -32,6 +33,9 @@ function RoomInfo({ roomNumber, numberOfPlayers }: RoomInfoProps) {
         </h1>
         <p className='text-sm text-white'>
           Number of Players: {numberOfPlayers}
+        </p>
+        <p className='text-sm text-white'>
+          Turn number: {turnNumber}
         </p>
       </div>
 
