@@ -1,4 +1,6 @@
-const baseCardImagePath = '/images/action_cards/';
+const baseCardImagePath = '/images/cards/';
+const baseTokenImagePath = '/images/game_tokens/';
+
 
 export enum CardTypes {
   GO_SALON = 'GO_SALON',
@@ -99,21 +101,21 @@ export class Card {
 
   getImageFromType(): string {
     if (this.type === CardTypes.GO_SALON) {
-      return `${baseCardImagePath}action_cards/go_salon.png`;
+      return `${baseCardImagePath}action_cards/go_salon.webp`;
     } else if (this.type === CardTypes.GO_STOVE) {
-      return `${baseCardImagePath}action_cards/go_stove.png`;
+      return `${baseCardImagePath}action_cards/go_stove.webp`;
     } else if (this.type === CardTypes.GO_PANTRY) {
-      return `${baseCardImagePath}action_cards/go_pantry.png`;
+      return `${baseCardImagePath}action_cards/go_pantry.webp`;
     } else if (this.type === CardTypes.GO_COUNTERTOP) {
-      return `${baseCardImagePath}action_cards/go_countertop.png`;
+      return `${baseCardImagePath}action_cards/go_countertop.webp`;
     } else if (this.type === CardTypes.PREPARE) {
-      return `${baseCardImagePath}action_cards/prepare.png`;
+      return `${baseCardImagePath}action_cards/prepare.webp`;
     } else if (this.type === CardTypes.GET) {
-      return `${baseCardImagePath}action_cards/get.png`;
+      return `${baseCardImagePath}action_cards/get.webp`;
     } else if (this.type === CardTypes.LET_GO) {
-      return `${baseCardImagePath}action_cards/let_go.png`;
+      return `${baseCardImagePath}action_cards/let_go.webp`;
     } else {
-      return `${baseCardImagePath}action_cards/default.png`; // Default image for unknown card types
+      return `${baseCardImagePath}action_cards/default.webp`; // Default image for unknown card types
     }
   }
 }
