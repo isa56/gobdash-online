@@ -41,6 +41,7 @@ export default function Game() {
     deckOfCards.dealCards(5),
   );
   const [playedCards, setPlayedCards] = useState<Record<string, CardModel>>({});
+  const [discardPile, setDiscardPile] = useState<CardModel[]>([]);
   const [draggingCard, setDraggingCard] = useState<CardModel | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -76,14 +77,18 @@ export default function Game() {
     const [slotId, card] = entries[0];
 
     if (slotId === DISCARD_SLOT_ID) {
-      // Card goes to the discard pile — just remove it from the board
+      // Card goes to the discard pile
+      setDiscardPile((prev) => [...prev, card]);
       setPlayedCards({});
       setTurnNumber((prev) => prev + 1);
       return;
     }
 
     // Slot ids are "action-slot-N". N is the insertion index into cardTableCards.
-    const slotIndex = parseInt(slotId.replace(`${ACTION_SLOT_PREFIX}-`, ''), 10);
+    const slotIndex = parseInt(
+      slotId.replace(`${ACTION_SLOT_PREFIX}-`, ''),
+      10,
+    );
 
     setCardTableCards((prev) => {
       const next = [...prev];
@@ -152,8 +157,17 @@ export default function Game() {
           />
         </div>
 
-        {/* Player hand */}
-        <PlayerHand hand={hand} draggingCard={draggingCard} />
+        {/* Player hand (includes Discard Pile) */}
+        <PlayerHand
+          hand={hand}
+          draggingCard={draggingCard}
+          discardPile={discardPile}
+          stagedDiscardCard={playedCards[DISCARD_SLOT_ID] ?? null}
+          discardDisabled={
+            Object.keys(playedCards).length > 0 && !playedCards[DISCARD_SLOT_ID]
+          }
+          onClearStagedDiscard={() => handleClearSlot(DISCARD_SLOT_ID)}
+        />
 
         <div className='flex justify-center align-end'>
           <button
