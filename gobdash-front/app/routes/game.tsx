@@ -121,7 +121,7 @@ export default function Game() {
         </div>
 
         {/* Card table + Buy deck + Discard pile */}
-        <div className='flex items-center gap-6 mt-4 mb-4'>
+        <div className='flex items-center justify-between gap-6 my-4 px-2 w-full'>
           <CardTable
             cards={cardTableCards}
             playedCards={playedCards}
@@ -131,7 +131,7 @@ export default function Game() {
             onBuyCard={handleSelectBuyFromTable}
           />
 
-          <div className='flex justify-center items-top gap-4 mr-4'>
+          <div className='flex flex-col justify-center items-top gap-4 mr-4'>
             <CardDeck
               deckCount={deckCount}
               turnPhase={turnPhase}
