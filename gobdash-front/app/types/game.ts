@@ -1,3 +1,5 @@
+const baseCardImagePath = '/images/action_cards/';
+
 export enum CardTypes {
   GO_SALON = 'GO_SALON',
   GO_STOVE = 'GO_STOVE',
@@ -97,21 +99,21 @@ export class Card {
 
   getImageFromType(): string {
     if (this.type === CardTypes.GO_SALON) {
-      return '/images/action_cards/go_salon.png';
+      return `${baseCardImagePath}action_cards/go_salon.png`;
     } else if (this.type === CardTypes.GO_STOVE) {
-      return '/images/action_cards/go_stove.png';
+      return `${baseCardImagePath}action_cards/go_stove.png`;
     } else if (this.type === CardTypes.GO_PANTRY) {
-      return '/images/action_cards/go_pantry.png';
+      return `${baseCardImagePath}action_cards/go_pantry.png`;
     } else if (this.type === CardTypes.GO_COUNTERTOP) {
-      return '/images/action_cards/go_countertop.png';
+      return `${baseCardImagePath}action_cards/go_countertop.png`;
     } else if (this.type === CardTypes.PREPARE) {
-      return '/images/action_cards/prepare.png';
+      return `${baseCardImagePath}action_cards/prepare.png`;
     } else if (this.type === CardTypes.GET) {
-      return '/images/action_cards/get.png';
+      return `${baseCardImagePath}action_cards/get.png`;
     } else if (this.type === CardTypes.LET_GO) {
-      return '/images/action_cards/let_go.png';
+      return `${baseCardImagePath}action_cards/let_go.png`;
     } else {
-      return '/images/action_cards/default.png'; // Default image for unknown card types
+      return `${baseCardImagePath}action_cards/default.png`; // Default image for unknown card types
     }
   }
 }
