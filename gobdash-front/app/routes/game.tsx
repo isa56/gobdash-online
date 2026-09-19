@@ -151,12 +151,14 @@ export default function Game() {
           </div>
         </div>
 
-        {/* Player hand */}
-        <PlayerHand
-          hand={hand}
-          draggingCard={draggingCard}
-          turnPhase={turnPhase}
-        />
+        <div className='flex'>
+          {/* Player hand */}
+          <PlayerHand
+            hand={hand}
+            draggingCard={draggingCard}
+            turnPhase={turnPhase}
+          />
+        </div>
 
         {/* Phase-aware floating action button */}
         <PhaseButton

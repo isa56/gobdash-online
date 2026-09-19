@@ -36,7 +36,7 @@ export default function CardTable({
     <div className='card-table flex flex-wrap justify-center items-center gap-2'>
       {/* Leading slot — insert before the first card */}
       <div className='px-1'>
-        <ActionSlot {...slotProps(makeSlotId(0))} />
+        <ActionSlot key={makeSlotId(0)} {...slotProps(makeSlotId(0))} />
       </div>
 
       {cards &&
@@ -66,7 +66,7 @@ export default function CardTable({
                 )}
               </div>
               <div className='px-1'>
-                <ActionSlot {...slotProps(slotId)} />
+                <ActionSlot key={slotId} {...slotProps(slotId)} />
               </div>
             </div>
           );

@@ -12,7 +12,7 @@ interface ActionSlotProps {
   onClear?: () => void;
 }
 
-export default function ActionSlot({
+function DroppableSlot({
   id,
   playedCard,
   disabled = false,
@@ -52,5 +52,9 @@ export default function ActionSlot({
       )}
     </div>
   );
+}
+
+export default function ActionSlot(props: ActionSlotProps) {
+  return <DroppableSlot key={props.id} {...props} />;
 }
 
