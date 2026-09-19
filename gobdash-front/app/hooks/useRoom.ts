@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useGameStore } from '~/store/gameStore';
 import { socketService } from '~/services/socketService';
+import { roomService } from '~/services/roomService';
 import type { ConnectionStatus, ServerEvent } from '~/types/server';
 
 /**
@@ -17,6 +18,7 @@ export function useRoom(roomId: string): { connectionStatus: ConnectionStatus } 
   const setRoomId = useGameStore((s) => s.setRoomId);
   const setConnectionStatus = useGameStore((s) => s.setConnectionStatus);
   const applyServerState = useGameStore((s) => s.applyServerState);
+  const resetGame = useGameStore((s) => s.resetGame);
   const playerId = useGameStore((s) => s.playerId) ?? 'local-player';
   const connectionStatus = useGameStore((s) => s.connectionStatus);
 
@@ -40,9 +42,10 @@ export function useRoom(roomId: string): { connectionStatus: ConnectionStatus } 
     return () => {
       socketService.off('GAME_STATE_UPDATE', handleStateUpdate);
       socketService.disconnect();
-      setConnectionStatus('disconnected');
+      roomService.leaveRoom(roomId, playerId).catch(() => {});
+      resetGame();
     };
-  }, [roomId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [roomId, playerId, resetGame]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { connectionStatus };
 }

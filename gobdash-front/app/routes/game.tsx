@@ -42,6 +42,7 @@ export default function Game() {
     numberOfPlayers,
     mounted,
     initLocalGame,
+    resetGame,
     setDraggingCard,
     handleDrop,
     handleClearSlot,
@@ -53,7 +54,10 @@ export default function Game() {
 
   useEffect(() => {
     initLocalGame();
-  }, [initLocalGame]);
+    return () => {
+      resetGame();
+    };
+  }, [initLocalGame, resetGame, roomId]);
 
   if (!mounted) {
     return <LoadingSpinner />;

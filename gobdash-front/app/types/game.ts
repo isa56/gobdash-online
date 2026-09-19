@@ -134,7 +134,7 @@ export class DeckOfCards {
   cards: Card[];
 
   constructor(cards: Card[]) {
-    this.cards = cards;
+    this.cards = [...cards];
 
     this.shuffle();
   }

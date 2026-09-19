@@ -1,4 +1,4 @@
-﻿import {
+import {
   Recipe,
   Ingredient,
   PreparationStep,
@@ -66,8 +66,8 @@ const recipes: Recipe[] = [
   ),
 ];
 
-const originalDeckOfCards: DeckOfCards = new DeckOfCards([
-  // go sallon cards:
+const CARD_DEFINITIONS: Card[] = [
+  // go salon cards:
   new Card(1, CardTypes.GO_SALON),
   new Card(2, CardTypes.GO_SALON),
   new Card(3, CardTypes.GO_SALON),
@@ -114,8 +114,12 @@ const originalDeckOfCards: DeckOfCards = new DeckOfCards([
   new Card(32, CardTypes.LET_GO),
   new Card(33, CardTypes.LET_GO),
   new Card(34, CardTypes.LET_GO),
-]);
+];
 
-const deckOfCards: DeckOfCards = new DeckOfCards([...originalDeckOfCards.cards]);
+function createDeck(): DeckOfCards {
+  return new DeckOfCards(CARD_DEFINITIONS.map((c) => new Card(c.id, c.type)));
+}
 
-export { ingredients, recipes, deckOfCards };
+const deckOfCards: DeckOfCards = createDeck();
+
+export { ingredients, recipes, deckOfCards, createDeck };

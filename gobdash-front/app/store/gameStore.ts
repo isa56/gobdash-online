@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import type { Card } from '~/types/game';
+import type { Card, DeckOfCards } from '~/types/game';
 import type { ConnectionStatus, ServerGameStatePayload } from '~/types/server';
-import { deckOfCards } from '~/types/constants';
+import { createDeck } from '~/types/constants';
 import { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID } from '~/lib/slots';
 
 export type TurnPhase = 'use' | 'buy';
@@ -21,6 +21,7 @@ interface GameStore {
   playedCards: Record<string, Card>;
   bought: BoughtSelection;
   draggingCard: Card | null;
+  localDeck: DeckOfCards | null;
 
   // ── Turn flow ────────────────────────────────────────────────────────────────
   turnPhase: TurnPhase;
@@ -34,6 +35,8 @@ interface GameStore {
    * Guarded by `mounted` so StrictMode's double-invocation is harmless.
    */
   initLocalGame: () => void;
+  /** Reset game and room state back to initial defaults. */
+  resetGame: () => void;
   setDraggingCard: (card: Card | null) => void;
   /** Process a successful drag-drop onto a slot. */
   handleDrop: (targetId: string, card: Card) => void;
@@ -56,11 +59,10 @@ interface GameStore {
   applyServerState: (payload: ServerGameStatePayload) => void;
 }
 
-export const useGameStore = create<GameStore>()((set, get) => ({
-  // ── Defaults ────────────────────────────────────────────────────────────────
+const initialGameState = {
   roomId: null,
   playerId: null,
-  connectionStatus: 'disconnected',
+  connectionStatus: 'disconnected' as ConnectionStatus,
 
   hand: [],
   cardTableCards: [],
@@ -69,22 +71,34 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   playedCards: {},
   bought: null,
   draggingCard: null,
+  localDeck: null,
 
-  turnPhase: 'use',
+  turnPhase: 'use' as TurnPhase,
   turnNumber: 1,
   numberOfPlayers: 4,
   mounted: false,
+};
+
+export const useGameStore = create<GameStore>()((set, get) => ({
+  // ── Defaults ────────────────────────────────────────────────────────────────
+  ...initialGameState,
 
   // ── Local game init ──────────────────────────────────────────────────────────
   initLocalGame: () => {
     // Guard prevents double-deal in React StrictMode (effects run twice in dev).
     if (get().mounted) return;
+    const deck = createDeck();
     set({
-      hand: deckOfCards.dealCards(5),
-      cardTableCards: deckOfCards.dealCards(5),
-      deckCount: deckOfCards.cards.length,
+      localDeck: deck,
+      hand: deck.dealCards(5),
+      cardTableCards: deck.dealCards(5),
+      deckCount: deck.cards.length,
       mounted: true,
     });
+  },
+
+  resetGame: () => {
+    set(initialGameState);
   },
 
   // ── UI actions ───────────────────────────────────────────────────────────────
@@ -147,7 +161,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   },
 
   handleSelectBuyFromDeck: () => {
-    const topCard = deckOfCards.cards[0];
+    const topCard = get().localDeck?.cards[0];
     if (!topCard) return; // deck empty
     set((state) => ({
       bought: state.bought?.source === 'deck' ? null : { card: topCard, source: 'deck' },
@@ -155,15 +169,16 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   },
 
   handleConfirmBuy: () => {
-    const { bought } = get();
+    const { bought, localDeck } = get();
     if (!bought) return;
 
     if (bought.source === 'deck') {
-      const [dealtCard] = deckOfCards.dealCards(1);
+      if (!localDeck) return;
+      const [dealtCard] = localDeck.dealCards(1);
       if (!dealtCard) return; // deck ran out
       set((state) => ({
         hand: [...state.hand, dealtCard],
-        deckCount: deckOfCards.cards.length,
+        deckCount: localDeck.cards.length,
         bought: null,
         turnPhase: 'use',
         turnNumber: state.turnNumber + 1,
