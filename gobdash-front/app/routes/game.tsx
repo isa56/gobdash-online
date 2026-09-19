@@ -9,6 +9,7 @@ import PlayerHand from '~/components/game/PlayerHand';
 import RoomInfo from '~/components/room/RoomInfo';
 import CardTable from '~/components/game/CardTable';
 import CardDeck from '~/components/game/CardDeck';
+import DiscardPile from '~/components/game/DiscardPile';
 import { useGameState } from '~/hooks/useGameState';
 import { useRoom } from '~/hooks/useRoom';
 import PhaseButton from '~/components/game/PhaseButton';
@@ -115,7 +116,7 @@ export default function Game() {
           </span>
         </div>
 
-        {/* Card table + Buy deck */}
+        {/* Card table + Buy deck + Discard pile */}
         <div className='flex items-center gap-6 mt-4 mb-4'>
           <CardTable
             cards={cardTableCards}
@@ -126,7 +127,7 @@ export default function Game() {
             onBuyCard={handleSelectBuyFromTable}
           />
 
-          <div>
+          <div className='flex justify-center items-top gap-4 mr-4'>
             <CardDeck
               deckCount={deckCount}
               turnPhase={turnPhase}
@@ -134,18 +135,26 @@ export default function Game() {
               onSelect={handleSelectBuyFromDeck}
             />
 
-            
+            <DiscardPile
+              pile={discardPile}
+              stagedCard={playedCards[DISCARD_SLOT_ID] ?? null}
+              disabled={
+                turnPhase === 'buy' ||
+                (hasStaged && !playedCards[DISCARD_SLOT_ID])
+              }
+              onClearStaged={
+                turnPhase === 'buy'
+                  ? undefined
+                  : () => handleClearSlot(DISCARD_SLOT_ID)
+              }
+            />
           </div>
         </div>
 
-        {/* Player hand (includes Discard Pile) */}
+        {/* Player hand */}
         <PlayerHand
           hand={hand}
           draggingCard={draggingCard}
-          discardPile={discardPile}
-          stagedDiscardCard={playedCards[DISCARD_SLOT_ID] ?? null}
-          discardDisabled={hasStaged && !playedCards[DISCARD_SLOT_ID]}
-          onClearStagedDiscard={() => handleClearSlot(DISCARD_SLOT_ID)}
           turnPhase={turnPhase}
         />
 
