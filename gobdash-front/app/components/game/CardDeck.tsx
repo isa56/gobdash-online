@@ -48,9 +48,7 @@ export default function CardDeck({
             <span className='text-stone-500 text-sm font-semibold'>Empty</span>
           ) : (
             <>
-              <span className='text-5xl font-bold text-stone-200'>
-                {deckCount}
-              </span>
+              <span className='text-5xl font-bold text-stone-200'>{deckCount}</span>
               <span className='text-xs text-stone-400 uppercase tracking-wider'>
                 {isSelected ? 'Click again to cancel' : 'Click to select'}
               </span>
@@ -67,3 +65,4 @@ export default function CardDeck({
     </div>
   );
 }
+

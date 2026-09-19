@@ -2,7 +2,7 @@ import { DragOverlay } from '@dnd-kit/react';
 import DraggableCard from './DraggableCard';
 import type { Card as CardModel } from '~/types/game';
 import Card from './Card';
-import DiscardPile from './DicardPile';
+import DiscardPile from './DiscardPile';
 
 interface PlayerHandProps {
   hand: CardModel[] | null;
@@ -14,7 +14,7 @@ interface PlayerHandProps {
   turnPhase: 'use' | 'buy';
 }
 
-function PlayerHand({
+export default function PlayerHand({
   hand,
   draggingCard,
   discardPile,
@@ -34,24 +34,21 @@ function PlayerHand({
             Hand
           </p>
           <div className='flex items-center justify-center w-full gap-4'>
-            {hand
-              ? hand.map((card, index) => {
-                  const angle = (index - (hand.length - 1) / 2) * 4.5;
-                  const verticalOffset = angle * angle * 0.4;
-                  return (
-                    <div
-                      key={card.id}
-                      style={{
-                        transform: `translateY(${verticalOffset}px) rotate(${angle}deg)`,
-                        transformOrigin: 'bottom center',
-                      }}
-                      className='shrink-0'>
-                      {/* Disable dragging during buy phase */}
-                      <DraggableCard card={card} disabled={isBuyPhase} />
-                    </div>
-                  );
-                })
-              : null}
+            {hand?.map((card, index) => {
+              const angle = (index - (hand.length - 1) / 2) * 4.5;
+              const verticalOffset = angle * angle * 0.4;
+              return (
+                <div
+                  key={card.id}
+                  style={{
+                    transform: `translateY(${verticalOffset}px) rotate(${angle}deg)`,
+                    transformOrigin: 'bottom center',
+                  }}
+                  className='shrink-0'>
+                  <DraggableCard card={card} disabled={isBuyPhase} />
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -76,4 +73,3 @@ function PlayerHand({
   );
 }
 
-export default PlayerHand;

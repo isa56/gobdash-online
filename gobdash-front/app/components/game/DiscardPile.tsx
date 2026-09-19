@@ -1,16 +1,16 @@
 import { useDroppable } from '@dnd-kit/react';
 import Card from './Card';
 import type { Card as CardModel } from '~/types/game';
-import { DISCARD_SLOT_ID } from './ActionSlot';
+import { DISCARD_SLOT_ID } from '~/lib/slots';
 
 interface DiscardPileProps {
-  /** Cards already confirmed into the discard pile */
+  /** Cards already confirmed into the discard pile. */
   pile: CardModel[];
-  /** Card currently staged (dragged) onto the discard slot but not yet confirmed */
+  /** Card currently staged (dragged) onto the discard slot but not yet confirmed. */
   stagedCard: CardModel | null;
-  /** Whether this slot should be locked (another slot is already filled this turn) */
+  /** Whether this slot should be locked (another slot is already filled this turn). */
   disabled?: boolean;
-  /** Called when the player clicks X to take the staged card back */
+  /** Called when the player clicks X to return the staged card to hand. */
   onClearStaged?: () => void;
 }
 
@@ -20,13 +20,9 @@ export default function DiscardPile({
   disabled = false,
   onClearStaged,
 }: DiscardPileProps) {
-  const { ref, isDropTarget } = useDroppable({
-    id: DISCARD_SLOT_ID,
-    disabled,
-  });
+  const { ref, isDropTarget } = useDroppable({ id: DISCARD_SLOT_ID, disabled });
 
   const topCard = pile[pile.length - 1] ?? null;
-  const isEmpty = pile.length === 0 && !stagedCard;
 
   return (
     <div className='flex flex-col items-center gap-2'>
@@ -34,7 +30,6 @@ export default function DiscardPile({
         Discard
       </p>
 
-      {/* Drop zone */}
       <div
         ref={ref}
         className={[
@@ -48,9 +43,7 @@ export default function DiscardPile({
                 ? 'border-red-400 bg-red-50/10'
                 : 'border-stone-400 bg-stone-800/20',
         ].join(' ')}>
-
         {stagedCard ? (
-          /* A card is staged (dropped but not yet confirmed) */
           <div className='relative flex items-center justify-center h-full w-full'>
             <Card card={stagedCard} />
             {onClearStaged && (
@@ -67,19 +60,16 @@ export default function DiscardPile({
             </span>
           </div>
         ) : topCard ? (
-          /* Show the top of the confirmed pile */
           <div className='flex items-center justify-center h-full w-full'>
             <Card card={topCard} />
           </div>
         ) : (
-          /* Empty pile */
           <span className='select-none text-sm text-stone-400 text-center px-2'>
             {isDropTarget ? 'Release to discard' : 'Drop to discard'}
           </span>
         )}
       </div>
 
-      {/* Pile count badge */}
       {pile.length > 0 && (
         <span className='text-xs text-stone-400'>
           {pile.length} card{pile.length !== 1 ? 's' : ''}
@@ -88,3 +78,4 @@ export default function DiscardPile({
     </div>
   );
 }
+

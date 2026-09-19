@@ -1,21 +1,21 @@
 import { useState } from 'react';
-import ToastComponent from './utils/ToastComponent';
+import ToastComponent from '../ui/ToastComponent';
 import { BsArrowLeft } from 'react-icons/bs';
 import { NavLink } from 'react-router';
 
 interface RoomInfoProps {
-  roomNumber: number;
+  roomId: string | number;
   numberOfPlayers: number;
   turnNumber: number;
 }
 
-function RoomInfo({ roomNumber, numberOfPlayers, turnNumber }: RoomInfoProps) {
+export default function RoomInfo({ roomId, numberOfPlayers, turnNumber }: RoomInfoProps) {
   const [showToast, setShowToast] = useState(false);
 
   function onCopy() {
-    navigator.clipboard.writeText(roomNumber.toString());
+    navigator.clipboard.writeText(roomId.toString());
     setShowToast(true);
-    setTimeout(() => setShowToast(false), 200000);
+    setTimeout(() => setShowToast(false), 2000);
   }
 
   return (
@@ -29,7 +29,7 @@ function RoomInfo({ roomNumber, numberOfPlayers, turnNumber }: RoomInfoProps) {
         <h1
           className='text-2xl font-bold font-emphasis text-sand-dune cursor-pointer'
           onClick={onCopy}>
-          Room: <span className='text-fern-light'>{roomNumber}</span>
+          Room: <span className='text-fern-light'>{roomId}</span>
         </h1>
         <p className='text-sm text-white'>
           Number of Players: {numberOfPlayers}
@@ -51,4 +51,3 @@ function RoomInfo({ roomNumber, numberOfPlayers, turnNumber }: RoomInfoProps) {
   );
 }
 
-export default RoomInfo;

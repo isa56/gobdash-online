@@ -21,11 +21,10 @@ export default function DraggableCard({ card, disabled = false }: DraggableCardP
       style={{ touchAction: 'none' }}
       className={[
         'transition-opacity duration-100',
-        disabled
-          ? 'cursor-default opacity-60'
-          : 'cursor-grab active:cursor-grabbing',
+        disabled ? 'cursor-default opacity-60' : 'cursor-grab active:cursor-grabbing',
         isDragging ? 'opacity-30' : 'opacity-100',
       ].join(' ')}
     />
   );
 }
+

@@ -32,7 +32,7 @@ const typeStyles = {
   },
 };
 
-function ToastComponent({ text, type, show, onClose }: ToastComponentProps) {
+export default function ToastComponent({ text, type, show, onClose }: ToastComponentProps) {
   const { border, iconBg, icon } = typeStyles[type];
 
   return (
@@ -56,6 +56,4 @@ function ToastComponent({ text, type, show, onClose }: ToastComponentProps) {
     </AnimatePresence>
   );
 }
-
-export default ToastComponent;
 

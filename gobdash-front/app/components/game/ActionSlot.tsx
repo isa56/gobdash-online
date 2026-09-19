@@ -1,12 +1,9 @@
 import { useDroppable } from '@dnd-kit/react';
 import Card from './Card';
 import type { Card as CardModel } from '~/types/game';
+import { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID, makeSlotId } from '~/lib/slots';
 
-export const ACTION_SLOT_PREFIX = 'action-slot';
-export const DISCARD_SLOT_ID = 'discard-slot';
-export function makeSlotId(index: number) {
-  return `${ACTION_SLOT_PREFIX}-${index}`;
-}
+export { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID, makeSlotId };
 
 interface ActionSlotProps {
   id: string;
@@ -27,11 +24,8 @@ export default function ActionSlot({
     <div
       ref={ref}
       className={[
-        // Size matches the card
         'flex w-38 min-h-56 h-full items-center justify-center rounded-xl',
-        // Dashed border drop zone
         'border-2 border-dashed transition-all duration-150',
-        // Styles based on state
         disabled && !playedCard
           ? 'border-stone-600 bg-stone-900/10 opacity-40 cursor-not-allowed'
           : isDropTarget
@@ -59,3 +53,4 @@ export default function ActionSlot({
     </div>
   );
 }
+
