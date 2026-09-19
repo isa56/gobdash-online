@@ -6,10 +6,21 @@ interface CardTableProps {
   cards: CardModel[] | null;
   playedCards: Record<string, CardModel>;
   onClearSlot: (slotId: string) => void;
+  turnPhase: 'use' | 'buy';
+  boughtCard: CardModel | null;
+  onBuyCard: (card: CardModel) => void;
 }
 
-function CardTable({ cards, playedCards, onClearSlot }: CardTableProps) {
-  // Once one slot has a card, all other empty slots are locked for this turn
+function CardTable({
+  cards,
+  playedCards,
+  onClearSlot,
+  turnPhase,
+  boughtCard,
+  onBuyCard,
+}: CardTableProps) {
+  const isBuyPhase = turnPhase === 'buy';
+  // In use phase: lock slots when one is already filled. In buy phase: lock all slots.
   const hasPlayedThisTurn = Object.keys(playedCards).length > 0;
 
   function slotProps(slotId: string) {
@@ -17,8 +28,7 @@ function CardTable({ cards, playedCards, onClearSlot }: CardTableProps) {
     return {
       id: slotId,
       playedCard,
-      // disable empty slots only when another slot is already filled
-      disabled: hasPlayedThisTurn && !playedCard,
+      disabled: isBuyPhase || (hasPlayedThisTurn && !playedCard),
       onClear: () => onClearSlot(slotId),
     };
   }
@@ -26,6 +36,7 @@ function CardTable({ cards, playedCards, onClearSlot }: CardTableProps) {
   return (
     <>
       <div className='card-table flex flex-wrap justify-center items-center gap-2'>
+        {/* Leading slot (insert before first card) */}
         <div className='px-1'>
           <ActionSlot {...slotProps(makeSlotId(0))} />
         </div>
@@ -34,10 +45,29 @@ function CardTable({ cards, playedCards, onClearSlot }: CardTableProps) {
           cards.length > 0 &&
           cards.map((card, index) => {
             const slotId = makeSlotId(index + 1);
+            const isSelected = isBuyPhase && boughtCard?.id === card.id;
+
             return (
-              <div className='flex' key={card.id}>
+              <div className='flex items-center' key={card.id}>
                 <div className='px-1'>
-                  <Card card={card} />
+                  {isBuyPhase ? (
+                    /* Buy phase: card is a clickable buy target */
+                    <button
+                      type='button'
+                      onClick={() => onBuyCard(card)}
+                      aria-label={`Buy ${card.type}`}
+                      className={[
+                        'rounded-xl transition-all duration-150 cursor-pointer',
+                        isSelected
+                          ? 'ring-4 ring-amber-400 scale-105 shadow-lg shadow-amber-400/30'
+                          : 'hover:ring-2 hover:ring-amber-300 hover:scale-105',
+                      ].join(' ')}>
+                      <Card card={card} />
+                    </button>
+                  ) : (
+                    /* Use phase: plain card */
+                    <Card card={card} />
+                  )}
                 </div>
                 <div className='px-1'>
                   <ActionSlot {...slotProps(slotId)} />

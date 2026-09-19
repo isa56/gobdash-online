@@ -11,6 +11,7 @@ interface PlayerHandProps {
   stagedDiscardCard: CardModel | null;
   discardDisabled?: boolean;
   onClearStagedDiscard?: () => void;
+  turnPhase: 'use' | 'buy';
 }
 
 function PlayerHand({
@@ -20,10 +21,13 @@ function PlayerHand({
   stagedDiscardCard,
   discardDisabled = false,
   onClearStagedDiscard,
+  turnPhase,
 }: PlayerHandProps) {
+  const isBuyPhase = turnPhase === 'buy';
+
   return (
     <>
-      <div className='flex items-end justify-center gap-6 w-95/100 mb-4'>
+      <div className='flex items-end justify-center gap-6 w-full mb-4'>
         {/* Fan of cards */}
         <div className='flex flex-col gap-2 flex-1 items-center'>
           <p className='text-sm font-semibold uppercase tracking-widest text-stone-400'>
@@ -42,7 +46,8 @@ function PlayerHand({
                         transformOrigin: 'bottom center',
                       }}
                       className='shrink-0'>
-                      <DraggableCard card={card} />
+                      {/* Disable dragging during buy phase */}
+                      <DraggableCard card={card} disabled={isBuyPhase} />
                     </div>
                   );
                 })
@@ -50,18 +55,18 @@ function PlayerHand({
           </div>
         </div>
 
-        {/* Discard pile — always visible to the right of the hand */}
+        {/* Discard pile — locked during buy phase */}
         <DiscardPile
           pile={discardPile}
           stagedCard={stagedDiscardCard}
-          disabled={discardDisabled}
-          onClearStaged={onClearStagedDiscard}
+          disabled={isBuyPhase || discardDisabled}
+          onClearStaged={isBuyPhase ? undefined : onClearStagedDiscard}
         />
       </div>
 
-      {/* Drag overlay - renders the card clone that follows the cursor */}
+      {/* Drag overlay — hidden during buy phase */}
       <DragOverlay>
-        {draggingCard ? (
+        {!isBuyPhase && draggingCard ? (
           <div className='rotate-3 scale-110 drop-shadow-2xl'>
             <Card card={draggingCard} />
           </div>

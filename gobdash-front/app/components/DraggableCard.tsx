@@ -4,12 +4,14 @@ import type { Card as CardModel } from '~/types/game';
 
 interface DraggableCardProps {
   card: CardModel;
+  disabled?: boolean;
 }
 
-export default function DraggableCard({ card }: DraggableCardProps) {
+export default function DraggableCard({ card, disabled = false }: DraggableCardProps) {
   const { ref, isDragging } = useDraggable({
     id: card.id,
     data: { card },
+    disabled,
   });
 
   return (
@@ -17,7 +19,13 @@ export default function DraggableCard({ card }: DraggableCardProps) {
       ref={ref}
       card={card}
       style={{ touchAction: 'none' }}
-      className={`cursor-grab active:cursor-grabbing transition-opacity duration-100 ${isDragging ? 'opacity-30' : 'opacity-100'}`}
+      className={[
+        'transition-opacity duration-100',
+        disabled
+          ? 'cursor-default opacity-60'
+          : 'cursor-grab active:cursor-grabbing',
+        isDragging ? 'opacity-30' : 'opacity-100',
+      ].join(' ')}
     />
   );
 }

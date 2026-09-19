@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
-import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
+import { DragDropProvider } from '@dnd-kit/react';
 import type { Route } from './+types/home';
 import { deckOfCards } from '~/types/constants';
 import type { Card as CardModel } from '~/types/game';
-import DraggableCard from '~/components/DraggableCard';
 import ActionSlot, {
   ACTION_SLOT_PREFIX,
   DISCARD_SLOT_ID,
-  makeSlotId,
 } from '~/components/ActionSlot';
 import LoadingSpinner from '~/components/utils/LoadingSpinner';
 import PlayerHand from '~/components/PlayerHand';
 import RoomInfo from '~/components/RoomInfo';
 import CardTable from '~/components/CardTable';
+import CardDeck from '~/components/CardDeck';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -21,84 +20,129 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-/** Fisher-Yates shuffle — returns a new array */
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+type TurnPhase = 'use' | 'buy';
+type BoughtSelection = { card: CardModel; source: 'table' | 'deck' } | null;
 
 export default function Game() {
   const roomId = '1234';
+  const numberOfPlayers = 4;
 
-  // Start with a deterministic slice so the server and client first-render match.
-  // The shuffle happens in useEffect (client-only) to avoid hydration mismatch.
-  const [hand, setHand] = useState<CardModel[]>(deckOfCards.dealCards(5));
-  const [cardTableCards, setCardTableCards] = useState<CardModel[]>(
-    deckOfCards.dealCards(5),
-  );
-  const [playedCards, setPlayedCards] = useState<Record<string, CardModel>>({});
+  // ── Core game state ────────────────────────────────────────────────────────
+  // Start empty — all dealing happens in useEffect (client-only) to prevent
+  // React StrictMode's double-invocation from over-depleting the singleton deck.
+  const [hand, setHand] = useState<CardModel[]>([]);
+  const [cardTableCards, setCardTableCards] = useState<CardModel[]>([]);
   const [discardPile, setDiscardPile] = useState<CardModel[]>([]);
+
+  // ── Turn flow ──────────────────────────────────────────────────────────────
+  const [playedCards, setPlayedCards] = useState<Record<string, CardModel>>({});
+  const [turnPhase, setTurnPhase] = useState<TurnPhase>('use');
+  const [bought, setBought] = useState<BoughtSelection>(null);
+  const [deckCount, setDeckCount] = useState(0);
+
+  // ── UI state ───────────────────────────────────────────────────────────────
   const [draggingCard, setDraggingCard] = useState<CardModel | null>(null);
+  const [turnNumber, setTurnNumber] = useState(1);
   const [mounted, setMounted] = useState(false);
 
-  const [turnNumber, setTurnNumber] = useState(1);
-  const [numberOfPlayers, setNumberOfPlayers] = useState(4);
-
   useEffect(() => {
-    // Deal a fresh hand on the client only.
-    // setHand(deckOfCards.dealCards(5));
-
+    // All dealing happens here — runs exactly once on the client.
+    setHand(deckOfCards.dealCards(5));
     setCardTableCards(deckOfCards.dealCards(5));
-
+    setDeckCount(deckOfCards.cards.length);
     setMounted(true);
   }, []);
 
+  // ── Phase 1 helpers ────────────────────────────────────────────────────────
+
+  /** Return a staged card from an ActionSlot/DiscardPile back to hand. */
   function handleClearSlot(slotId: string) {
     const card = playedCards[slotId];
-    if (card) {
-      // Return the card to the end of the hand
-      setHand((prev) => [...prev, card]);
-      setPlayedCards((prev) => {
-        const next = { ...prev };
-        delete next[slotId];
-        return next;
-      });
-    }
+    if (!card) return;
+    setHand((prev) => [...prev, card]);
+    setPlayedCards((prev) => {
+      const next = { ...prev };
+      delete next[slotId];
+      return next;
+    });
   }
 
-  function handleConfirmTurn() {
+  /**
+   * Commit the staged card:
+   * – DiscardPile  → push to discardPile
+   * – ActionSlot-N → insert at index N in cardTableCards
+   * Then advance to buy phase.
+   */
+  function handleConfirmUse() {
     const entries = Object.entries(playedCards);
-    if (entries.length === 0) return; // nothing played — do not advance
+    if (entries.length === 0) return;
 
     const [slotId, card] = entries[0];
 
     if (slotId === DISCARD_SLOT_ID) {
-      // Card goes to the discard pile
       setDiscardPile((prev) => [...prev, card]);
-      setPlayedCards({});
-      setTurnNumber((prev) => prev + 1);
-      return;
+    } else {
+      const slotIndex = parseInt(
+        slotId.replace(`${ACTION_SLOT_PREFIX}-`, ''),
+        10,
+      );
+      setCardTableCards((prev) => {
+        const next = [...prev];
+        next.splice(slotIndex, 0, card);
+        return next;
+      });
     }
 
-    // Slot ids are "action-slot-N". N is the insertion index into cardTableCards.
-    const slotIndex = parseInt(
-      slotId.replace(`${ACTION_SLOT_PREFIX}-`, ''),
-      10,
-    );
-
-    setCardTableCards((prev) => {
-      const next = [...prev];
-      next.splice(slotIndex, 0, card);
-      return next;
-    });
-
     setPlayedCards({});
+    setTurnPhase('buy');
+  }
+
+  // ── Phase 2 helpers ────────────────────────────────────────────────────────
+
+  /** Toggle buy selection for a table card. */
+  function handleSelectBuyFromTable(card: CardModel) {
+    setBought((prev) =>
+      prev?.card.id === card.id && prev.source === 'table'
+        ? null
+        : { card, source: 'table' },
+    );
+  }
+
+  /** Toggle buy selection for the deck (top card). */
+  function handleSelectBuyFromDeck() {
+    const topCard = deckOfCards.cards[0];
+    if (!topCard) return; // deck is empty
+    setBought((prev) =>
+      prev?.source === 'deck' ? null : { card: topCard, source: 'deck' },
+    );
+  }
+
+  /**
+   * Commit the buy:
+   * – deck  → deal 1 card, add to hand, update deckCount
+   * – table → remove from cardTableCards, add to hand
+   * Then reset to use phase and advance turn.
+   */
+  function handleConfirmBuy() {
+    if (!bought) return;
+
+    if (bought.source === 'deck') {
+      const dealt = deckOfCards.dealCards(1);
+      const dealtCard = dealt[0];
+      if (!dealtCard) return; // deck ran out — shouldn't happen but guard
+      setHand((prev) => [...prev, dealtCard]);
+      setDeckCount(deckOfCards.cards.length);
+    } else {
+      setCardTableCards((prev) => prev.filter((c) => c.id !== bought.card.id));
+      setHand((prev) => [...prev, bought.card]);
+    }
+
+    setBought(null);
+    setTurnPhase('use');
     setTurnNumber((prev) => prev + 1);
   }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   if (!mounted) {
     return (
@@ -108,18 +152,19 @@ export default function Game() {
     );
   }
 
+  const hasStaged = Object.keys(playedCards).length > 0;
+
   return (
     <div className='flex flex-col items-center justify-center gap-4 w-full h-full pb-8'>
       <DragDropProvider
         onDragStart={(event) => {
-          const card = event.operation.source?.data?.card as
-            CardModel | undefined;
+          if (turnPhase === 'buy') return; // locked during buy phase
+          const card = event.operation.source?.data?.card as CardModel | undefined;
           setDraggingCard(card ?? null);
         }}
         onDragEnd={(event) => {
           setDraggingCard(null);
-
-          if (event.canceled) return;
+          if (event.canceled || turnPhase === 'buy') return;
 
           const targetId = event.operation.target?.id as string | undefined;
           const droppedOnSlot =
@@ -127,11 +172,13 @@ export default function Game() {
             targetId === DISCARD_SLOT_ID;
           if (!droppedOnSlot || !targetId) return;
 
-          const card = event.operation.source?.data?.card as
-            CardModel | undefined;
+          const card = event.operation.source?.data?.card as CardModel | undefined;
           if (!card) return;
 
-          // If there was already a card in this slot, return it to the hand first
+          // If another slot was already filled this turn, reject the drop
+          if (hasStaged && !playedCards[targetId]) return;
+
+          // If this slot already had a card, return it to hand first
           const existingCard = playedCards[targetId];
           setHand((prev) => {
             const next = prev.filter((c) => c.id !== card.id);
@@ -148,12 +195,43 @@ export default function Game() {
           />
         </div>
 
-        {/* Action slot - drop target */}
-        <div className='mt-8 mb-8'>
+        {/* Turn phase indicator */}
+        <div className='flex items-center gap-3 text-sm'>
+          <span
+            className={
+              turnPhase === 'use'
+                ? 'text-amber-400 font-bold'
+                : 'text-stone-500'
+            }>
+            1. Use a card
+          </span>
+          <span className='text-stone-600'>→</span>
+          <span
+            className={
+              turnPhase === 'buy'
+                ? 'text-amber-400 font-bold'
+                : 'text-stone-500'
+            }>
+            2. Buy a card
+          </span>
+        </div>
+
+        {/* Card table + Buy deck */}
+        <div className='flex items-center gap-6 mt-4 mb-4'>
           <CardTable
             cards={cardTableCards}
             playedCards={playedCards}
             onClearSlot={handleClearSlot}
+            turnPhase={turnPhase}
+            boughtCard={bought?.source === 'table' ? bought.card : null}
+            onBuyCard={handleSelectBuyFromTable}
+          />
+
+          <CardDeck
+            deckCount={deckCount}
+            turnPhase={turnPhase}
+            isSelected={bought?.source === 'deck'}
+            onSelect={handleSelectBuyFromDeck}
           />
         </div>
 
@@ -163,20 +241,30 @@ export default function Game() {
           draggingCard={draggingCard}
           discardPile={discardPile}
           stagedDiscardCard={playedCards[DISCARD_SLOT_ID] ?? null}
-          discardDisabled={
-            Object.keys(playedCards).length > 0 && !playedCards[DISCARD_SLOT_ID]
-          }
+          discardDisabled={hasStaged && !playedCards[DISCARD_SLOT_ID]}
           onClearStagedDiscard={() => handleClearSlot(DISCARD_SLOT_ID)}
+          turnPhase={turnPhase}
         />
 
-        <div className='flex justify-center align-end'>
-          <button
-            type='button'
-            disabled={Object.keys(playedCards).length === 0}
-            className='cursor-pointer px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-500'
-            onClick={handleConfirmTurn}>
-            Confirm Turn
-          </button>
+        {/* Phase-aware action button */}
+        <div className='flex justify-center'>
+          {turnPhase === 'use' ? (
+            <button
+              type='button'
+              disabled={!hasStaged}
+              className='cursor-pointer px-6 py-2 bg-amber-500 text-white font-semibold rounded hover:bg-amber-600 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-amber-500'
+              onClick={handleConfirmUse}>
+              Confirm Use →
+            </button>
+          ) : (
+            <button
+              type='button'
+              disabled={bought === null}
+              className='cursor-pointer px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-500'
+              onClick={handleConfirmBuy}>
+              Confirm Buy ✓
+            </button>
+          )}
         </div>
       </DragDropProvider>
     </div>
