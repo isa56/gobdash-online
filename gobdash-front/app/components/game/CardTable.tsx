@@ -29,6 +29,7 @@ export default function CardTable({
       playedCard,
       disabled: isBuyPhase || (hasPlayedThisTurn && !playedCard),
       onClear: () => onClearSlot(slotId),
+      isExpandable: !isBuyPhase && !playedCard,
     };
   }
 
