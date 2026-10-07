@@ -11,7 +11,7 @@ export default function PlayerHand({ hand, turnPhase }: PlayerHandProps) {
 
   return (
     <>
-      <div className='flex flex-col items-center gap-2 w-100 mb-4'>
+      <div className='flex flex-col items-center w-100'>
         {/* Fan of cards */}
         <p className='text-sm font-semibold uppercase tracking-widest text-stone-400'>
           Hand

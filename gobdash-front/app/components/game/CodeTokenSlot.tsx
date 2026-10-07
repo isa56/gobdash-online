@@ -1,4 +1,4 @@
-import { useDroppable } from '@dnd-kit/react';
+import { useDraggable, useDroppable } from '@dnd-kit/react';
 import type { CodeTokenType } from './CodeToken';
 
 interface CodeTokenSlotProps {
@@ -19,11 +19,21 @@ export default function CodeTokenSlot({
   disabled = false,
   onClear,
 }: CodeTokenSlotProps) {
-  const { ref, isDropTarget } = useDroppable({ id, disabled });
+  const { ref: dropRef, isDropTarget } = useDroppable({
+    id,
+    disabled,
+    accept: 'code-token',
+  });
+  const { ref: dragRef, isDragging } = useDraggable({
+    id: token ? `${token}1` : `${id}-empty`,
+    data: token ? { type: token } : undefined,
+    type: 'code-token',
+    disabled: disabled || !token,
+  });
 
   return (
     <div
-      ref={ref}
+      ref={dropRef}
       className={[
         'group absolute -top-4 left-1/2 z-10 flex h-12 w-12 -translate-x-1/2',
         'items-center justify-center rounded-full border-2 border-dashed transition-all',
@@ -40,7 +50,11 @@ export default function CodeTokenSlot({
           <img
             src={tokenImages[token]}
             alt={`${token} code token`}
-            className='h-32 object-contain'
+            ref={dragRef}
+            className={[
+              'h-32 object-contain cursor-grab active:cursor-grabbing transition-opacity duration-100',
+              isDragging ? 'opacity-30' : 'opacity-100',
+            ].join(' ')}
             draggable={false}
           />
           {!disabled && (
