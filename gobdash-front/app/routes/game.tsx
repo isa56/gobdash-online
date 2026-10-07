@@ -189,6 +189,9 @@ export default function Game() {
             hand={hand}
             turnPhase={turnPhase}
           />
+
+          {/* Map Button */}
+          
         </div>
 
         {/* Keep the overlay outside flex layouts so it cannot affect their sizing. */}
