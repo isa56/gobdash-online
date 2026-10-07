@@ -20,7 +20,11 @@ function DroppableSlot({
   isExpandable = false,
   onClear,
 }: ActionSlotProps) {
-  const { ref, isDropTarget } = useDroppable({ id, disabled });
+  const { ref, isDropTarget } = useDroppable({
+    id,
+    disabled,
+    accept: 'card',
+  });
   const isCollapsible = isExpandable && !playedCard;
 
   return (
