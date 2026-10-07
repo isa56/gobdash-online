@@ -36,7 +36,7 @@ export default function CardTable({
       playedCard,
       disabled: isBuyPhase || (hasPlayedThisTurn && !playedCard),
       onClear: () => onClearSlot(slotId),
-      isExpandable: !isBuyPhase && !playedCard,
+      isExpandable: !playedCard,
     };
   }
 
@@ -59,7 +59,6 @@ export default function CardTable({
                 <CodeTokenSlot
                   id={makeCardTokenId(card.id)}
                   token={placedTokens[card.id] ?? null}
-                  disabled={isBuyPhase}
                   onClear={() => onClearToken(card.id)}
                 />
                 {isBuyPhase ? (

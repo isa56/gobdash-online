@@ -76,14 +76,19 @@ export default function Game() {
     <div className='flex flex-col items-center justify-center gap-4 w-full h-full pb-8'>
       <DragDropProvider
         onDragStart={(event) => {
-          if (turnPhase === 'buy') return; // locked during buy phase
           const card = event.operation.source?.data?.card as
             CardModel | undefined;
           setDraggingCard(card ?? null);
         }}
         onDragEnd={(event) => {
           setDraggingCard(null);
-          if (event.canceled || turnPhase === 'buy') return;
+          if (event.canceled) return;
+
+          const token = event.operation.source?.data?.type as
+            | CodeTokenType
+            | undefined;
+          const isCodeToken = token === 'program' || token === 'error';
+          if (turnPhase === 'buy' && !isCodeToken) return;
 
           const targetId = event.operation.target?.id as string | undefined;
           const droppedOnSlot =
@@ -92,11 +97,8 @@ export default function Game() {
             targetId?.startsWith(CARD_TOKEN_PREFIX);
           if (!droppedOnSlot || !targetId) return;
 
-          const token = event.operation.source?.data?.type as
-            | CodeTokenType
-            | undefined;
           if (targetId.startsWith(CARD_TOKEN_PREFIX)) {
-            if (token === 'program' || token === 'error') {
+            if (isCodeToken) {
               handleTokenDrop(targetId, token);
             }
             return;
