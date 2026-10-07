@@ -17,6 +17,7 @@ import PhaseButton from '~/components/game/PhaseButton';
 import CodeTokenContainer from '~/components/game/CodeTokenContainer';
 import Card from '~/components/game/Card';
 import type { CodeTokenType } from '~/components/game/CodeToken';
+import MiniMap from '~/components/game/MiniBoard';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -85,8 +86,7 @@ export default function Game() {
           if (event.canceled) return;
 
           const token = event.operation.source?.data?.type as
-            | CodeTokenType
-            | undefined;
+            CodeTokenType | undefined;
           const isCodeToken = token === 'program' || token === 'error';
           if (turnPhase === 'buy' && !isCodeToken) return;
 
@@ -177,23 +177,26 @@ export default function Game() {
           </div>
         </div>
 
-        <div className='flex items-center justify-evenly w-full mb-4'>
+        <div className='flex items-center justify-evenly gap-18 w-full mb-4'>
           {/* Code Token Container */}
-          <CodeTokenContainer
-            placedTokens={{
-              program: Object.values(placedTokens).includes('program'),
-              error: Object.values(placedTokens).includes('error'),
-            }}
-          />
+          <div className='gap-6'>
+            <CodeTokenContainer
+              placedTokens={{
+                program: Object.values(placedTokens).includes('program'),
+                error: Object.values(placedTokens).includes('error'),
+              }}
+            />
+          </div>
 
           {/* Player hand */}
-          <PlayerHand
-            hand={hand}
-            turnPhase={turnPhase}
-          />
+          <div className='gap-6'>
+            <PlayerHand hand={hand} turnPhase={turnPhase} />
+          </div>
 
           {/* Map Button */}
-          
+          <div className='gap-6'>
+            <MiniMap />
+          </div>
         </div>
 
         {/* Keep the overlay outside flex layouts so it cannot affect their sizing. */}
@@ -217,4 +220,3 @@ export default function Game() {
     </div>
   );
 }
-
