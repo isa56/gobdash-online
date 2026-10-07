@@ -12,6 +12,7 @@ export default function DraggableCard({ card, disabled = false }: DraggableCardP
     id: card.id,
     data: { card },
     disabled,
+    type: 'card',
   });
 
   return (

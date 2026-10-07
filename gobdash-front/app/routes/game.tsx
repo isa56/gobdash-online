@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router';
-import { DragDropProvider } from '@dnd-kit/react';
+import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
 import type { Route } from './+types/game';
 import type { Card as CardModel } from '~/types/game';
 import { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID } from '~/lib/slots';
+import { CARD_TOKEN_PREFIX } from '~/lib/slots';
 import LoadingSpinner from '~/components/ui/LoadingSpinner';
 import PlayerHand from '~/components/game/PlayerHand';
 import RoomInfo from '~/components/room/RoomInfo';
@@ -13,6 +14,9 @@ import DiscardPile from '~/components/game/DiscardPile';
 import { useGameState } from '~/hooks/useGameState';
 import { useRoom } from '~/hooks/useRoom';
 import PhaseButton from '~/components/game/PhaseButton';
+import CodeTokenContainer from '~/components/game/CodeTokenContainer';
+import Card from '~/components/game/Card';
+import type { CodeTokenType } from '~/components/game/CodeToken';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -36,6 +40,7 @@ export default function Game() {
     deckCount,
     playedCards,
     bought,
+    placedTokens,
     draggingCard,
     turnPhase,
     turnNumber,
@@ -50,6 +55,8 @@ export default function Game() {
     handleSelectBuyFromTable,
     handleSelectBuyFromDeck,
     handleConfirmBuy,
+    handleTokenDrop,
+    handleClearToken,
   } = useGameState();
 
   useEffect(() => {
@@ -81,8 +88,19 @@ export default function Game() {
           const targetId = event.operation.target?.id as string | undefined;
           const droppedOnSlot =
             targetId?.startsWith(ACTION_SLOT_PREFIX) ||
-            targetId === DISCARD_SLOT_ID;
+            targetId === DISCARD_SLOT_ID ||
+            targetId?.startsWith(CARD_TOKEN_PREFIX);
           if (!droppedOnSlot || !targetId) return;
+
+          const token = event.operation.source?.data?.type as
+            | CodeTokenType
+            | undefined;
+          if (targetId.startsWith(CARD_TOKEN_PREFIX)) {
+            if (token === 'program' || token === 'error') {
+              handleTokenDrop(targetId, token);
+            }
+            return;
+          }
 
           const card = event.operation.source?.data?.card as
             CardModel | undefined;
@@ -129,6 +147,8 @@ export default function Game() {
             turnPhase={turnPhase}
             boughtCard={bought?.source === 'table' ? bought.card : null}
             onBuyCard={handleSelectBuyFromTable}
+            placedTokens={placedTokens}
+            onClearToken={handleClearToken}
           />
 
           <div className='flex flex-col justify-center items-top gap-4 mr-4'>
@@ -155,14 +175,33 @@ export default function Game() {
           </div>
         </div>
 
-        <div className='flex'>
+        <div className='flex items-center justify-evenly w-full px-4'>
+          {/* Code Token Container */}
+          <CodeTokenContainer
+            placedTokens={{
+              program: Object.values(placedTokens).includes('program'),
+              error: Object.values(placedTokens).includes('error'),
+            }}
+          />
+
           {/* Player hand */}
           <PlayerHand
             hand={hand}
-            draggingCard={draggingCard}
             turnPhase={turnPhase}
           />
+
+          {/* Map Button */}
+          
         </div>
+
+        {/* Keep the overlay outside flex layouts so it cannot affect their sizing. */}
+        <DragOverlay>
+          {turnPhase !== 'buy' && draggingCard ? (
+            <div className='rotate-3 scale-110 drop-shadow-2xl'>
+              <Card card={draggingCard} />
+            </div>
+          ) : null}
+        </DragOverlay>
 
         {/* Phase-aware floating action button */}
         <PhaseButton

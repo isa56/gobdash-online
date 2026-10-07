@@ -1,6 +1,9 @@
 import type { Card as CardModel } from '~/types/game';
 import ActionSlot, { makeSlotId } from './ActionSlot';
 import Card from './Card';
+import CodeTokenSlot from './CodeTokenSlot';
+import type { CodeTokenType } from './CodeToken';
+import { makeCardTokenId } from '~/lib/slots';
 
 interface CardTableProps {
   cards: CardModel[] | null;
@@ -9,6 +12,8 @@ interface CardTableProps {
   turnPhase: 'use' | 'buy';
   boughtCard: CardModel | null;
   onBuyCard: (card: CardModel) => void;
+  placedTokens: Record<number, CodeTokenType>;
+  onClearToken: (cardId: number) => void;
 }
 
 export default function CardTable({
@@ -18,6 +23,8 @@ export default function CardTable({
   turnPhase,
   boughtCard,
   onBuyCard,
+  placedTokens,
+  onClearToken,
 }: CardTableProps) {
   const isBuyPhase = turnPhase === 'buy';
   const hasPlayedThisTurn = Object.keys(playedCards).length > 0;
@@ -48,7 +55,13 @@ export default function CardTable({
 
           return (
             <div className='flex items-center' key={card.id}>
-              <div className='px-1'>
+              <div className='relative px-1'>
+                <CodeTokenSlot
+                  id={makeCardTokenId(card.id)}
+                  token={placedTokens[card.id] ?? null}
+                  disabled={isBuyPhase}
+                  onClear={() => onClearToken(card.id)}
+                />
                 {isBuyPhase ? (
                   <button
                     type='button'

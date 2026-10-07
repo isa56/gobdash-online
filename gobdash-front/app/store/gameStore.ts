@@ -2,7 +2,12 @@ import { create } from 'zustand';
 import type { Card, DeckOfCards } from '~/types/game';
 import type { ConnectionStatus, ServerGameStatePayload } from '~/types/server';
 import { createDeck } from '~/types/constants';
-import { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID } from '~/lib/slots';
+import {
+  ACTION_SLOT_PREFIX,
+  CARD_TOKEN_PREFIX,
+  DISCARD_SLOT_ID,
+} from '~/lib/slots';
+import type { CodeTokenType } from '~/components/game/CodeToken';
 
 export type TurnPhase = 'use' | 'buy';
 export type BoughtSelection = { card: Card; source: 'table' | 'deck' } | null;
@@ -20,6 +25,7 @@ interface GameStore {
   deckCount: number;
   playedCards: Record<string, Card>;
   bought: BoughtSelection;
+  placedTokens: Record<number, CodeTokenType>;
   draggingCard: Card | null;
   localDeck: DeckOfCards | null;
 
@@ -50,6 +56,8 @@ interface GameStore {
   handleSelectBuyFromDeck: () => void;
   /** Commit the buy and advance to the next turn. */
   handleConfirmBuy: () => void;
+  handleTokenDrop: (targetId: string, token: CodeTokenType) => void;
+  handleClearToken: (cardId: number) => void;
 
   // ── Server integration ───────────────────────────────────────────────────────
   setRoomId: (roomId: string) => void;
@@ -70,6 +78,7 @@ const initialGameState = {
   deckCount: 0,
   playedCards: {},
   bought: null,
+  placedTokens: {},
   draggingCard: null,
   localDeck: null,
 
@@ -192,6 +201,30 @@ export const useGameStore = create<GameStore>()((set, get) => ({
         turnNumber: state.turnNumber + 1,
       }));
     }
+  },
+
+  handleTokenDrop: (targetId, token) => {
+    if (!targetId.startsWith(CARD_TOKEN_PREFIX)) return;
+    const cardId = Number(
+      targetId.slice(`${CARD_TOKEN_PREFIX}-`.length),
+    );
+    if (!Number.isInteger(cardId)) return;
+
+    set((state) => {
+      const next = Object.fromEntries(
+        Object.entries(state.placedTokens).filter(([, value]) => value !== token),
+      ) as Record<number, CodeTokenType>;
+      next[cardId] = token;
+      return { placedTokens: next };
+    });
+  },
+
+  handleClearToken: (cardId) => {
+    set((state) => {
+      const next = { ...state.placedTokens };
+      delete next[cardId];
+      return { placedTokens: next };
+    });
   },
 
   // ── Server integration ───────────────────────────────────────────────────────
