@@ -7,7 +7,7 @@ interface CodeTokenContainerProps {
 
 function CodeTokenContainer({ placedTokens }: CodeTokenContainerProps) {
   return (
-    <div className='flex items-center justify-center gap-2'>
+    <div className='flex items-center justify-center'>
       {!placedTokens.program && <CodeToken type='program' id='program1' />}
 
       {!placedTokens.error && <CodeToken type='error' id='error1' />}

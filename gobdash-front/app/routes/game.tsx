@@ -177,7 +177,7 @@ export default function Game() {
           </div>
         </div>
 
-        <div className='flex items-center justify-evenly w-full px-4'>
+        <div className='flex items-center justify-evenly w-full mb-4'>
           {/* Code Token Container */}
           <CodeTokenContainer
             placedTokens={{
