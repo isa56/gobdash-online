@@ -149,6 +149,22 @@ npm run start      # serve o build gerado
 
 O servidor de desenvolvimento normalmente fica disponível em `http://localhost:5173`.
 
+## Publicação no GitHub Pages
+
+O workflow [deploy-pages.yml](../.github/workflows/deploy-pages.yml) publica
+automaticamente a versão mock no GitHub Pages a cada push na branch `main`.
+Ele também pode ser executado manualmente pela aba **Actions** do GitHub.
+
+Na primeira publicação, configure o repositório em **Settings > Pages**,
+selecionando **GitHub Actions** como origem da publicação. Depois que o
+workflow terminar, a aplicação ficará disponível em:
+
+`https://isa56.github.io/gobdash-online/`
+
+O build usa o caminho `/gobdash-online/` para funcionar como um site de projeto
+GitHub Pages e cria um `404.html` para manter as rotas da SPA acessíveis após
+recarregar a página.
+
 ## Estado atual e próximos pontos de integração
 
 - Tabuleiro ainda não foi implementado, nem o movimento dentro dele.
