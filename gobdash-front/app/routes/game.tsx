@@ -28,7 +28,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Game() {
   const params = useParams();
-  const roomId = params.roomId || '1234';
+  const roomId = params.roomId || '123456';
 
   // Room / WebSocket connection lifecycle
   useRoom(roomId);

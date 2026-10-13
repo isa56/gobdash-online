@@ -32,7 +32,7 @@ function DroppableSlot({
       ref={ref}
       className={[
         'group flex min-h-56 h-full items-center justify-center rounded-xl shrink-0',
-        'border-2 border-dashed transition-all duration-200 ease-in-out overflow-hidden',
+        'border-2 border-dashed transition-all duration-200 ease-in-out',
         isCollapsible
           ? isDropTarget
             ? 'w-38 scale-105 border-amber-400 bg-amber-50/20 shadow-lg shadow-amber-400/30'
