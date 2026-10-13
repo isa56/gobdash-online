@@ -16,7 +16,7 @@ flowchart LR
 		Game --> RoomHook[useRoom]
 		RoomHook --> Socket[socketService]
 		RoomHook --> Store[Zustand gameStore]
-		Game --> DnD[@dnd-kit/react]
+		Game --> DnD[dnd-kit/react]
 		DnD --> Store
 		Socket -->|GAME_STATE_UPDATE| Store
 		Store --> Components[Componentes do tabuleiro]
@@ -48,7 +48,7 @@ O estado global fica em `app/store/gameStore.ts`, usando Zustand. A store reúne
 
 `useGameState` é um hook fino que expõe a store para as rotas, mantendo a implementação da tela do jogo mais concentrada na composição dos componentes.
 
-O domínio de cartas está em `app/types/game.ts` e `app/types/constants.ts`. `Card`, `Recipe`, `Ingredient` e `DeckOfCards` representam o modelo atual; o baralho local é embaralhado e distribuído no cliente durante a inicialização da partida.
+O domínio de cartas está em `app/types/game.ts` e `app/types/constants.ts`. `Card`, `Recipe`, `Ingredient` e `DeckOfCards` representam o modelo atual; o baralho local é embaralhado e distribuído (atualmente, no cliente, mas no futuro na API) durante a inicialização da partida.
 
 ### Salas e comunicação
 
@@ -65,7 +65,20 @@ As integrações estão isoladas em dois serviços:
 - `roomService`: cliente REST para criar, entrar e sair de salas;
 - `socketService`: wrapper singleton do WebSocket, com registro tipado de handlers e envio de eventos.
 
-Ambos estão em modo mock por padrão. Para conectar a um backend real, é necessário desativar o mock nos respectivos serviços e configurar as URLs/rotas compatíveis com os contratos de `app/types/server.ts`.
+Ambos começam em modo mock por padrão. Para conectar a um backend real, use o
+modo `api` e configure as URLs/rotas compatíveis com os contratos de
+`app/types/server.ts`.
+
+A configuração fica centralizada em `app/config.ts`. Os valores são fornecidos
+pelos arquivos `.env.mock` e `.env.api`, selecionados pelo modo do Vite:
+
+- `npm run dev` e `npm run build`: modo mock (offline).
+- `npm run dev:api`: desenvolvimento usando a API e o WebSocket configurados em `.env.api`.
+- `npm run build:api`: build usando a API e o WebSocket configurados em `.env.api`.
+
+Para apontar para outro backend, altere apenas `VITE_API_BASE_URL` e
+`VITE_SOCKET_BASE_URL` em `.env.api`. Variáveis `VITE_*` são incorporadas ao
+bundle no build, portanto não devem conter segredos.
 
 ### Interface do jogo
 
@@ -127,8 +140,10 @@ Comandos disponíveis:
 
 ```bash
 npm run dev        # servidor de desenvolvimento
+npm run dev:api    # desenvolvimento com o backend real
 npm run typecheck  # gera tipos do React Router e executa o TypeScript
 npm run build      # build de produção
+npm run build:api  # build de produção com o backend real
 npm run start      # serve o build gerado
 ```
 
@@ -136,9 +151,9 @@ O servidor de desenvolvimento normalmente fica disponível em `http://localhost:
 
 ## Estado atual e próximos pontos de integração
 
-- A experiência principal roda offline com dados e comunicação mockados.
+- Tabuleiro ainda não foi implementado, nem o movimento dentro dele.
+- A aplicação roda offline com dados e comunicação mockados.
 - O WebSocket está preparado para eventos tipados de entrada e saída, mas `mockMode` está habilitado em `socketService`.
 - O REST de salas também está mockado em `roomService`.
 - O estado local inicial é criado no cliente; atualizações parciais do servidor já podem ser mescladas na store.
 - Ainda é necessário conectar os serviços a um backend real e definir a autoridade final das regras da partida para uma experiência multiplayer consistente.
-

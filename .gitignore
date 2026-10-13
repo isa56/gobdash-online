@@ -1,2 +1,4 @@
 gobdash-front/app/types/game.ts
 gobdash-front/convert_to_webp.py
+gobdash-front/.env.api
+gobdash-front/.env.mock

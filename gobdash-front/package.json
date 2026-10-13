@@ -3,8 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "react-router build",
-    "dev": "react-router dev",
+    "build": "npm run build:api",
+    "build:mock": "react-router build --mode mock",
+    "build:api": "react-router build --mode api",
+    "dev": "react-router dev --mode mock",
+    "dev:api": "react-router dev --mode api",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc"
   },
