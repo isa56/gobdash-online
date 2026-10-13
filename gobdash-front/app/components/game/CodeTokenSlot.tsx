@@ -1,4 +1,5 @@
 import { useDraggable, useDroppable } from '@dnd-kit/react';
+import { publicAssetPath } from '~/lib/assets';
 import type { CodeTokenType } from './CodeToken';
 
 interface CodeTokenSlotProps {
@@ -9,8 +10,8 @@ interface CodeTokenSlotProps {
 }
 
 const tokenImages: Record<CodeTokenType, string> = {
-  program: '/images/game_tokens/code_token.webp',
-  error: '/images/game_tokens/error_token.webp',
+  program: publicAssetPath('images/game_tokens/code_token.webp'),
+  error: publicAssetPath('images/game_tokens/error_token.webp'),
 };
 
 export default function CodeTokenSlot({

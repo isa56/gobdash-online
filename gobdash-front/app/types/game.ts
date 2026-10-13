@@ -1,5 +1,7 @@
-const baseCardImagePath = '/images/cards/';
-const baseTokenImagePath = '/images/game_tokens/';
+import { publicAssetPath } from '~/lib/assets';
+
+const baseCardImagePath = publicAssetPath('images/cards/');
+const baseTokenImagePath = publicAssetPath('images/game_tokens/');
 
 
 export enum CardTypes {

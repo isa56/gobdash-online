@@ -1,4 +1,5 @@
 import { useDraggable } from '@dnd-kit/react';
+import { publicAssetPath } from '~/lib/assets';
 
 export type CodeTokenType = 'program' | 'error';
 
@@ -10,8 +11,8 @@ interface CodeTokenProps {
 function CodeToken({ type, id }: CodeTokenProps) {
   const tokenImage =
     type === 'program'
-      ? '/images/game_tokens/code_token.webp'
-      : '/images/game_tokens/error_token.webp';
+      ? publicAssetPath('images/game_tokens/code_token.webp')
+      : publicAssetPath('images/game_tokens/error_token.webp');
   const tokenAlt = type === 'program' ? 'Code Token' : 'Error Token';
 
   const { ref, isDragging } = useDraggable({
