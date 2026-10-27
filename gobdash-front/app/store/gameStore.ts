@@ -7,7 +7,7 @@ import {
   CARD_TOKEN_PREFIX,
   DISCARD_SLOT_ID,
 } from '~/lib/slots';
-import type { CodeTokenType } from '~/components/game/CodeToken';
+import type { CodeTokenType } from '~/components/game/cardTable/CodeToken';
 
 export type TurnPhase = 'use' | 'buy';
 export type BoughtSelection = { card: Card; source: 'table' | 'deck' } | null;

@@ -6,18 +6,17 @@ import type { Card as CardModel } from '~/types/game';
 import { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID } from '~/lib/slots';
 import { CARD_TOKEN_PREFIX } from '~/lib/slots';
 import LoadingSpinner from '~/components/ui/LoadingSpinner';
-import PlayerHand from '~/components/game/PlayerHand';
+import PlayerHand from '~/components/game/cardTable/PlayerHand';
 import RoomInfo from '~/components/room/RoomInfo';
-import CardTable from '~/components/game/CardTable';
-import CardDeck from '~/components/game/CardDeck';
-import DiscardPile from '~/components/game/DiscardPile';
+import CardTable from '~/components/game/cardTable/CardTable';
+import CardDeck from '~/components/game/cardTable/CardDeck';
+import DiscardPile from '~/components/game/cardTable/DiscardPile';
 import { useGameState } from '~/hooks/useGameState';
 import { useRoom } from '~/hooks/useRoom';
-import PhaseButton from '~/components/game/PhaseButton';
-import CodeTokenContainer from '~/components/game/CodeTokenContainer';
-import Card from '~/components/game/Card';
-import type { CodeTokenType } from '~/components/game/CodeToken';
-import MiniMap from '~/components/game/MiniBoard';
+import PhaseButton from '~/components/game/cardTable/PhaseButton';
+import CodeTokenContainer from '~/components/game/cardTable/CodeTokenContainer';
+import Card from '~/components/game/cardTable/Card';
+import type { CodeTokenType } from '~/components/game/cardTable/CodeToken';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -191,11 +190,6 @@ export default function Game() {
           {/* Player hand */}
           <div className='gap-6'>
             <PlayerHand hand={hand} turnPhase={turnPhase} />
-          </div>
-
-          {/* Map Button */}
-          <div className='gap-6'>
-            <MiniMap />
           </div>
         </div>
 
