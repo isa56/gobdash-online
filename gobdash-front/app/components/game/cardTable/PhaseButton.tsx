@@ -1,5 +1,5 @@
 import type { BoughtSelection, TurnPhase } from '~/store/gameStore';
-import FloatingButton from '../ui/FloatingButton';
+import FloatingButton from '~/components/ui/FloatingButton';
 
 interface PhaseButtonProps {
   turnPhase: TurnPhase;

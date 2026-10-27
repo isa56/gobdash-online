@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import ToastComponent from '../ui/ToastComponent';
+import ToastComponent from '~/components/ui/ToastComponent';
 import { BsArrowLeft, BsFillPersonFill } from 'react-icons/bs';
 import { NavLink } from 'react-router';
 
