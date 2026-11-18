@@ -28,7 +28,7 @@ function CodeToken({ type, id }: CodeTokenProps) {
         alt={tokenAlt}
         style={{ touchAction: 'none' }}
         className={[
-          'h-32 text-shadow-md cursor-grab active:cursor-grabbing transition-opacity duration-100',
+          'h-22 text-shadow-md cursor-grab active:cursor-grabbing transition-opacity duration-100',
           isDragging ? 'opacity-30' : 'opacity-100',
         ].join(' ')}
         ref={ref}

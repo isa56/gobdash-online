@@ -31,15 +31,15 @@ function DroppableSlot({
     <div
       ref={ref}
       className={[
-        'group flex min-h-56 h-full items-center justify-center rounded-xl shrink-0',
+        'group flex min-h-49 h-full items-center justify-center rounded-xl shrink-0',
         'border-2 border-dashed transition-all duration-200 ease-in-out',
         isCollapsible
           ? isDropTarget
-            ? 'w-38 scale-105 border-amber-400 bg-amber-50/20 shadow-lg shadow-amber-400/30'
+            ? 'w-32 scale-105 border-amber-400 bg-amber-50/20 shadow-lg shadow-amber-400/30'
             : [
                 'w-8',
                 !disabled &&
-                  'hover:w-38 hover:border-amber-400/80 hover:bg-stone-800/60 cursor-pointer',
+                  'hover:w-32 hover:border-amber-400/80 hover:bg-stone-800/60 cursor-pointer',
                 disabled
                   ? 'border-stone-600/50 bg-stone-900/20 opacity-40 cursor-not-allowed'
                   : 'border-stone-400/80 bg-stone-800/40',
@@ -47,7 +47,7 @@ function DroppableSlot({
                 .filter(Boolean)
                 .join(' ')
           : [
-              'w-38',
+              'w-32',
               disabled && !playedCard
                 ? 'border-stone-600 bg-stone-900/10 opacity-40 cursor-not-allowed'
                 : isDropTarget

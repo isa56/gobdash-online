@@ -36,7 +36,7 @@ export default function CodeTokenSlot({
     <div
       ref={dropRef}
       className={[
-        'group absolute -top-4 left-1/2 z-10 flex h-12 w-12 -translate-x-1/2',
+        'group absolute -top-4 left-1/2 z-10 flex h-10 w-10 -translate-x-1/2',
         'items-center justify-center rounded-full border-2 border-dashed transition-all',
         disabled
           ? 'border-stone-600/50 bg-stone-900/40 opacity-50'
