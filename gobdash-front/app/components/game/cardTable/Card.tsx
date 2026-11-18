@@ -24,10 +24,12 @@ export default function Card({
       onClick={onClick}
       style={style}
       className={[
-        'relative flex w-32 shrink-0 cursor-pointer flex-col overflow-hidden rounded-sm',
+        'relative flex shrink-0 cursor-pointer flex-col overflow-hidden rounded-sm',
         'shadow-md outline-2 outline-transparent',
         'transition-all duration-150 ease-out',
         'hover:-translate-y-1 hover:shadow-xl',
+        card.mode === 'normal' ? 'w-32' : '',
+        card.mode === 'discarded' ? 'w-26' : '',
         selected
           ? 'outline-amber-400 ring-2 ring-amber-400 ring-offset-1'
           : 'hover:outline-amber-300',

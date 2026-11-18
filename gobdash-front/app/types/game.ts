@@ -94,6 +94,7 @@ export class Card {
   id: number;
   type: CardTypes;
   image: string;
+  mode: 'normal' | 'staged' | 'discarded' = 'normal';
 
   constructor(id: number, type: CardTypes) {
     this.id = id;

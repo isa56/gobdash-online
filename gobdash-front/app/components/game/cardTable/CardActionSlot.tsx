@@ -5,7 +5,7 @@ import { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID, makeSlotId } from '~/lib/slots';
 
 export { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID, makeSlotId };
 
-interface ActionSlotProps {
+interface CardActionSlotProps {
   id: string;
   playedCard: CardModel | null;
   disabled?: boolean;
@@ -19,7 +19,7 @@ function DroppableSlot({
   disabled = false,
   isExpandable = false,
   onClear,
-}: ActionSlotProps) {
+}: CardActionSlotProps) {
   const { ref, isDropTarget } = useDroppable({
     id,
     disabled,
@@ -47,7 +47,7 @@ function DroppableSlot({
                 .filter(Boolean)
                 .join(' ')
           : [
-              'w-32',
+              'w-33',
               disabled && !playedCard
                 ? 'border-stone-600 bg-stone-900/10 opacity-40 cursor-not-allowed'
                 : isDropTarget
@@ -99,7 +99,7 @@ function DroppableSlot({
   );
 }
 
-export default function ActionSlot(props: ActionSlotProps) {
+export default function CardActionSlot(props: CardActionSlotProps) {
   return <DroppableSlot key={props.id} {...props} />;
 }
 

@@ -33,7 +33,7 @@ export default function DiscardPile({
       <div
         ref={ref}
         className={[
-          'relative flex w-32 min-h-38 items-center justify-center rounded-xl',
+          'relative flex w-27 min-h-39 items-center justify-center rounded-xl',
           'border-2 border-dashed transition-all duration-150',
           disabled && !stagedCard
             ? 'border-stone-600 bg-stone-900/10 opacity-40 cursor-not-allowed'

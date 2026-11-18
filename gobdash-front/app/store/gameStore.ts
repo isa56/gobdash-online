@@ -122,9 +122,20 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     const existingCard = playedCards[targetId];
     set((state) => ({
       hand: existingCard
-        ? [...state.hand.filter((c) => c.id !== card.id), existingCard]
+        ? [
+            ...state.hand.filter((c) => c.id !== card.id),
+            Object.assign(existingCard, { mode: 'normal' as const }),
+          ]
         : state.hand.filter((c) => c.id !== card.id),
-      playedCards: { ...state.playedCards, [targetId]: card },
+      playedCards: {
+        ...state.playedCards,
+        [targetId]: Object.assign(card, {
+          mode:
+            targetId === DISCARD_SLOT_ID
+              ? ('discarded' as const)
+              : ('staged' as const),
+        }),
+      },
     }));
   },
 
@@ -134,7 +145,10 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     set((state) => {
       const next = { ...state.playedCards };
       delete next[slotId];
-      return { hand: [...state.hand, card], playedCards: next };
+      return {
+        hand: [...state.hand, Object.assign(card, { mode: 'normal' as const })],
+        playedCards: next,
+      };
     });
   },
 
@@ -154,7 +168,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
       const slotIndex = parseInt(slotId.replace(`${ACTION_SLOT_PREFIX}-`, ''), 10);
       set((state) => {
         const next = [...state.cardTableCards];
-        next.splice(slotIndex, 0, card);
+        next.splice(slotIndex, 0, Object.assign(card, { mode: 'normal' as const }));
         return { cardTableCards: next, playedCards: {}, turnPhase: 'buy' };
       });
     }
@@ -233,4 +247,3 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   setConnectionStatus: (connectionStatus) => set({ connectionStatus }),
   applyServerState: (payload) => set(payload),
 }));
-

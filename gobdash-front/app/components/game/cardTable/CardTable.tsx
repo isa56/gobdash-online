@@ -1,5 +1,5 @@
 import type { Card as CardModel } from '~/types/game';
-import ActionSlot, { makeSlotId } from './ActionSlot';
+import CardActionSlot, { makeSlotId } from './CardActionSlot';
 import Card from './Card';
 import CodeTokenSlot from './CodeTokenSlot';
 import type { CodeTokenType } from './CodeToken';
@@ -41,10 +41,10 @@ export default function CardTable({
   }
 
   return (
-    <div className='card-table flex flex-wrap justify-center items-center gap-2'>
+    <div className='card-table flex flex-wrap justify-center items-center gap-2 my-4'>
       {/* Leading slot — insert before the first card */}
       <div className='px-1'>
-        <ActionSlot key={makeSlotId(0)} {...slotProps(makeSlotId(0))} />
+        <CardActionSlot key={makeSlotId(0)} {...slotProps(makeSlotId(0))} />
       </div>
 
       {cards &&
@@ -79,7 +79,7 @@ export default function CardTable({
                 )}
               </div>
               <div className='px-1'>
-                <ActionSlot key={slotId} {...slotProps(slotId)} />
+                <CardActionSlot key={slotId} {...slotProps(slotId)} />
               </div>
             </div>
           );
