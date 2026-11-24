@@ -4,19 +4,24 @@ import type { Card as CardModel } from '~/types/game';
 interface PlayerHandProps {
   hand: CardModel[] | null;
   turnPhase: 'use' | 'buy';
+  className?: string;
 }
 
-export default function PlayerHand({ hand, turnPhase }: PlayerHandProps) {
+export default function PlayerHand({
+  hand,
+  turnPhase,
+  className = '',
+}: PlayerHandProps) {
   const isBuyPhase = turnPhase === 'buy';
 
   return (
     <>
-      <div className='flex flex-col items-center w-100'>
+      <div className={`flex flex-col items-center w-fit ${className}`}>
         {/* Fan of cards */}
         <p className='text-sm font-semibold uppercase tracking-widest text-stone-400'>
           Hand
         </p>
-        <div className='flex items-center justify-center w-full gap-4'>
+        <div className='flex items-center justify-center w-full gap-2 sm:gap-3 lg:gap-4'>
           {hand?.map((card, index) => {
             const angle = (index - (hand.length - 1) / 2) * 4.5;
             const verticalOffset = angle * angle * 0.4;

@@ -1,13 +1,15 @@
 import { useDroppable } from '@dnd-kit/react';
 import Card from './Card';
-import type { Card as CardModel } from '~/types/game';
+import type { Card as CardModel, CardMode } from '~/types/game';
 import { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID, makeSlotId } from '~/lib/slots';
 
 export { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID, makeSlotId };
 
-interface ActionSlotProps {
+interface CardActionSlotProps {
   id: string;
   playedCard: CardModel | null;
+  /** Mode override sourced from the store's cardModes map; avoids reading from the mutated card instance. */
+  playedCardMode?: CardMode;
   disabled?: boolean;
   isExpandable?: boolean;
   onClear?: () => void;
@@ -16,10 +18,11 @@ interface ActionSlotProps {
 function DroppableSlot({
   id,
   playedCard,
+  playedCardMode,
   disabled = false,
   isExpandable = false,
   onClear,
-}: ActionSlotProps) {
+}: CardActionSlotProps) {
   const { ref, isDropTarget } = useDroppable({
     id,
     disabled,
@@ -31,15 +34,15 @@ function DroppableSlot({
     <div
       ref={ref}
       className={[
-        'group flex min-h-56 h-full items-center justify-center rounded-xl shrink-0',
-        'border-2 border-dashed transition-all duration-200 ease-in-out overflow-hidden',
+        'group flex h-45 items-center justify-center rounded-xl shrink-0',
+        'border-2 border-dashed transition-all duration-200 ease-in-out',
         isCollapsible
           ? isDropTarget
-            ? 'w-38 scale-105 border-amber-400 bg-amber-50/20 shadow-lg shadow-amber-400/30'
+            ? 'w-32 scale-105 border-amber-400 bg-amber-50/20 shadow-lg shadow-amber-400/30'
             : [
                 'w-8',
                 !disabled &&
-                  'hover:w-38 hover:border-amber-400/80 hover:bg-stone-800/60 cursor-pointer',
+                  'hover:w-32 hover:border-amber-400/80 hover:bg-stone-800/60 cursor-pointer',
                 disabled
                   ? 'border-stone-600/50 bg-stone-900/20 opacity-40 cursor-not-allowed'
                   : 'border-stone-400/80 bg-stone-800/40',
@@ -47,7 +50,7 @@ function DroppableSlot({
                 .filter(Boolean)
                 .join(' ')
           : [
-              'w-38',
+              'w-33',
               disabled && !playedCard
                 ? 'border-stone-600 bg-stone-900/10 opacity-40 cursor-not-allowed'
                 : isDropTarget
@@ -56,8 +59,8 @@ function DroppableSlot({
             ].join(' '),
       ].join(' ')}>
       {playedCard ? (
-        <div className='relative h-full w-full flex items-center justify-center'>
-          <Card card={playedCard} />
+        <div className='relative h-full w-full flex items-center justify-center overflow-visible'>
+          <Card card={playedCard} mode={playedCardMode} />
           {onClear && (
             <button
               type='button'
@@ -99,7 +102,7 @@ function DroppableSlot({
   );
 }
 
-export default function ActionSlot(props: ActionSlotProps) {
+export default function CardActionSlot(props: CardActionSlotProps) {
   return <DroppableSlot key={props.id} {...props} />;
 }
 

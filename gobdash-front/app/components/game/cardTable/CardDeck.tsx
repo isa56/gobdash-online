@@ -26,7 +26,7 @@ export default function CardDeck({
         disabled={disabled}
         aria-label={`Buy deck, ${deckCount} cards remaining`}
         className={[
-          'relative flex w-38 min-h-56 items-center justify-center rounded-xl',
+          'relative flex w-26 min-h-38 items-center justify-center rounded-xl',
           'border-2 transition-all duration-150 select-none',
           disabled
             ? 'border-stone-700 opacity-40 cursor-not-allowed'

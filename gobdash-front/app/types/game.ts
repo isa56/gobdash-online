@@ -3,7 +3,6 @@ import { publicAssetPath } from '~/lib/assets';
 const baseCardImagePath = publicAssetPath('images/cards/');
 const baseTokenImagePath = publicAssetPath('images/game_tokens/');
 
-
 export enum CardTypes {
   GO_SALON = 'GO_SALON',
   GO_STOVE = 'GO_STOVE',
@@ -23,15 +22,18 @@ type PreparationStatus = 'PREPARED' | 'UNPREPARED' | null;
 
 export class Recipe {
   name: string;
+  image: string;
   ingredients: Ingredient[];
   preparationSteps: PreparationStep[] = [];
 
   constructor(
     name: string,
+    image: string,
     ingredients: Ingredient[],
     preparationSteps: PreparationStep[] = [],
   ) {
     this.name = name;
+    this.image = image;
     this.ingredients = ingredients;
     this.preparationSteps = preparationSteps;
   }
@@ -61,15 +63,18 @@ export class Recipe {
 
 export class Ingredient {
   name: string;
+  image: string;
   hasPreparation: boolean;
   preparation: PreparationStatus;
 
   constructor(
     name: string,
+    image: string,
     hasPreparation: boolean,
     preparation?: 'PREPARED' | 'UNPREPARED' | null,
   ) {
     this.name = name;
+    this.image = image;
     this.hasPreparation = hasPreparation;
     if (preparation === undefined) {
       this.preparation = hasPreparation ? 'UNPREPARED' : null;
@@ -81,6 +86,17 @@ export class Ingredient {
 
 export type GamePhase = 'PLANNING' | 'EXECUTING' | 'DEBUGGING';
 
+export type BoardSpace =
+  | 'pantry'
+  | 'stove'
+  | 'countertop'
+  | 'salon'
+  | 'delivery'
+  | 'leftHand'
+  | 'rightHand';
+
+export type PantryFood = { id: number; food: Ingredient };
+
 export type ExecutionStep = {
   stepIndex: number; // Card Index of the list
   gobPlacement: CardTypes; // Represents the card that Gob placed
@@ -90,10 +106,13 @@ export type ExecutionStep = {
   delivered: boolean; // Indicates whether the recipe was delivered to the customer
 };
 
+export type CardMode = 'normal' | 'staged' | 'discarded';
+
 export class Card {
   id: number;
   type: CardTypes;
   image: string;
+  mode: CardMode = 'normal';
 
   constructor(id: number, type: CardTypes) {
     this.id = id;

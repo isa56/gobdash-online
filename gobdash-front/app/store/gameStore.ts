@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import type { Card, DeckOfCards } from '~/types/game';
+import type { BoardSpace, Card, DeckOfCards, PantryFood } from '~/types/game';
+import { socketService } from '~/services/socketService';
 import type { ConnectionStatus, ServerGameStatePayload } from '~/types/server';
 import { createDeck } from '~/types/constants';
 import {
@@ -7,10 +8,12 @@ import {
   CARD_TOKEN_PREFIX,
   DISCARD_SLOT_ID,
 } from '~/lib/slots';
-import type { CodeTokenType } from '~/components/game/CodeToken';
+import type { CodeTokenType } from '~/components/game/cardTable/CodeToken';
 
 export type TurnPhase = 'use' | 'buy';
 export type BoughtSelection = { card: Card; source: 'table' | 'deck' } | null;
+/** Tracks visual display mode per card id without mutating shared card instances. */
+export type CardMode = 'normal' | 'staged' | 'discarded';
 
 interface GameStore {
   // ── Connection ──────────────────────────────────────────────────────────────
@@ -24,10 +27,15 @@ interface GameStore {
   discardPile: Card[];
   deckCount: number;
   playedCards: Record<string, Card>;
+  /** Lookup map from card id → display mode. Never mutates card instances. */
+  cardModes: Record<number, CardMode>;
   bought: BoughtSelection;
   placedTokens: Record<number, CodeTokenType>;
   draggingCard: Card | null;
   localDeck: DeckOfCards | null;
+  gobSpace: BoardSpace;
+  foodPositions: Record<number, BoardSpace>;
+  foodTokens: PantryFood[];
 
   // ── Turn flow ────────────────────────────────────────────────────────────────
   turnPhase: TurnPhase;
@@ -58,6 +66,9 @@ interface GameStore {
   handleConfirmBuy: () => void;
   handleTokenDrop: (targetId: string, token: CodeTokenType) => void;
   handleClearToken: (cardId: number) => void;
+  moveGob: (space: BoardSpace) => void;
+  moveFood: (foodId: number, space: BoardSpace) => void;
+  addFood: (food: PantryFood) => void;
 
   // ── Server integration ───────────────────────────────────────────────────────
   setRoomId: (roomId: string) => void;
@@ -77,10 +88,14 @@ const initialGameState = {
   discardPile: [],
   deckCount: 0,
   playedCards: {},
+  cardModes: {} as Record<number, CardMode>,
   bought: null,
   placedTokens: {},
   draggingCard: null,
   localDeck: null,
+  gobSpace: 'salon' as BoardSpace,
+  foodPositions: {} as Record<number, BoardSpace>,
+  foodTokens: [] as PantryFood[],
 
   turnPhase: 'use' as TurnPhase,
   turnNumber: 1,
@@ -120,11 +135,19 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     if (hasStaged && !playedCards[targetId]) return;
 
     const existingCard = playedCards[targetId];
+    const newMode: CardMode =
+      targetId === DISCARD_SLOT_ID ? 'discarded' : 'staged';
+
     set((state) => ({
       hand: existingCard
         ? [...state.hand.filter((c) => c.id !== card.id), existingCard]
         : state.hand.filter((c) => c.id !== card.id),
       playedCards: { ...state.playedCards, [targetId]: card },
+      cardModes: {
+        ...state.cardModes,
+        ...(existingCard ? { [existingCard.id]: 'normal' as const } : {}),
+        [card.id]: newMode,
+      },
     }));
   },
 
@@ -134,7 +157,13 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     set((state) => {
       const next = { ...state.playedCards };
       delete next[slotId];
-      return { hand: [...state.hand, card], playedCards: next };
+      const nextModes = { ...state.cardModes };
+      delete nextModes[card.id];
+      return {
+        hand: [...state.hand, card],
+        playedCards: next,
+        cardModes: nextModes,
+      };
     });
   },
 
@@ -148,6 +177,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
       set((state) => ({
         discardPile: [...state.discardPile, card],
         playedCards: {},
+        cardModes: {},
         turnPhase: 'buy',
       }));
     } else {
@@ -155,7 +185,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
       set((state) => {
         const next = [...state.cardTableCards];
         next.splice(slotIndex, 0, card);
-        return { cardTableCards: next, playedCards: {}, turnPhase: 'buy' };
+        return { cardTableCards: next, playedCards: {}, cardModes: {}, turnPhase: 'buy' };
       });
     }
   },
@@ -227,10 +257,29 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     });
   },
 
+  moveGob: (space) => {
+    set({ gobSpace: space });
+    socketService.send({ type: 'MOVE_GOB', space });
+  },
+
+  moveFood: (foodId, space) => {
+    set((state) => ({
+      foodPositions: { ...state.foodPositions, [foodId]: space },
+    }));
+    socketService.send({ type: 'MOVE_FOOD', foodId, space });
+  },
+
+  addFood: (food) => {
+    set((state) => ({
+      foodTokens: [...state.foodTokens, food],
+      foodPositions: { ...state.foodPositions, [food.id]: 'pantry' },
+    }));
+    socketService.send({ type: 'ADD_FOOD', food });
+  },
+
   // ── Server integration ───────────────────────────────────────────────────────
   setRoomId: (roomId) => set({ roomId }),
   setPlayerId: (playerId) => set({ playerId }),
   setConnectionStatus: (connectionStatus) => set({ connectionStatus }),
   applyServerState: (payload) => set(payload),
 }));
-

@@ -1,0 +1,61 @@
+import { useDraggable } from '@dnd-kit/react';
+import type { Ingredient as FoodModel } from '~/types/game';
+
+interface FoodProps {
+  food: FoodModel;
+  selected?: boolean;
+  onClick?: () => void;
+  ref?: React.Ref<HTMLButtonElement>;
+  style?: React.CSSProperties;
+  className?: string;
+  draggable?: boolean;
+  dragId?: string;
+}
+
+export default function Food({
+  food,
+  selected = false,
+  onClick,
+  ref,
+  style,
+  className,
+  draggable = false,
+  dragId,
+}: FoodProps) {
+  const { ref: draggableRef, isDragging } = useDraggable({
+    id: dragId ?? `food-preview-${food.name}`,
+    type: 'food',
+    data: { food: true, foodName: food.name },
+    disabled: !draggable,
+  });
+  return (
+    <button
+      ref={draggable ? draggableRef : ref}
+      type='button'
+      onClick={onClick}
+      style={{ touchAction: draggable ? 'none' : undefined, ...style }}
+      className={[
+        'relative flex shrink-0 cursor-pointer flex-col overflow-hidden rounded-sm',
+        'shadow-md outline-2 outline-transparent',
+        'transition-all duration-150 ease-out',
+        draggable
+          ? 'cursor-grab active:cursor-grabbing hover:scale-105'
+          : 'hover:-translate-y-1 hover:shadow-xl',
+        isDragging ? 'opacity-30' : 'opacity-100',
+        selected
+          ? 'outline-amber-400 ring-2 ring-amber-400 ring-offset-1'
+          : 'hover:outline-amber-300',
+        className ?? '',
+      ].join(' ')}
+      aria-pressed={selected}
+      aria-label={food.name}>
+      <img
+        src={food.image}
+        alt={food.name}
+        className='w-full h-full object-cover pointer-events-none'
+        draggable={false}
+      />
+    </button>
+  );
+}
+

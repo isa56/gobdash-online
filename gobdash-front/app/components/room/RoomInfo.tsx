@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import ToastComponent from '../ui/ToastComponent';
+import ToastComponent from '~/components/ui/ToastComponent';
 import { BsArrowLeft, BsFillPersonFill } from 'react-icons/bs';
 import { NavLink } from 'react-router';
 
@@ -7,12 +7,14 @@ interface RoomInfoProps {
   roomId: string | number;
   numberOfPlayers: number;
   turnNumber: number;
+  turnPhase: 'use' | 'buy';
 }
 
 export default function RoomInfo({
   roomId,
   numberOfPlayers,
   turnNumber,
+  turnPhase,
 }: RoomInfoProps) {
   const [showToast, setShowToast] = useState(false);
 
@@ -25,7 +27,7 @@ export default function RoomInfo({
   function renderPlayerIcons() {
     const icons = [];
     for (let index = 0; index < numberOfPlayers; index++) {
-      icons.push(<BsFillPersonFill size="2em" key={index} />);
+      icons.push(<BsFillPersonFill size='2em' key={index} />);
     }
     return icons;
   }
@@ -38,7 +40,31 @@ export default function RoomInfo({
         <BsArrowLeft />
       </NavLink>
 
-      <div className='flex text-sunlit-clay'>{renderPlayerIcons()}</div>
+      <div className='flex flex-col items-center justify-center gap-2'>
+        <div className='flex text-sunlit-clay'>{renderPlayerIcons()}</div>
+        <div>
+          {/* Turn phase indicator */}
+          <div className='flex w-full items-center gap-3 text-sm'>
+            <span
+              className={
+                turnPhase === 'use'
+                  ? 'text-amber-400 font-bold'
+                  : 'text-stone-500'
+              }>
+              1. Use a card
+            </span>
+            <span className='text-stone-600'>→</span>
+            <span
+              className={
+                turnPhase === 'buy'
+                  ? 'text-amber-400 font-bold'
+                  : 'text-stone-500'
+              }>
+              2. Buy a card
+            </span>
+          </div>
+        </div>
+      </div>
 
       <div className='flex flex-col items-center justify-center gap-2 bg-espresso/75 p-4 rounded-sm'>
         <h1
@@ -47,7 +73,7 @@ export default function RoomInfo({
           Room: <span className='text-fern-light'>{roomId}</span>
         </h1>
         <p className='text-sm text-white'>
-          Player {(turnNumber % numberOfPlayers)}'s turn
+          Player {turnNumber % numberOfPlayers}'s turn
         </p>
         <p className='text-sm text-white'>Turn number: {turnNumber}</p>
       </div>
