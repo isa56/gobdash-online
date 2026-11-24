@@ -1,11 +1,11 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
 import { useDroppable } from '@dnd-kit/react';
 import GobToken from './board/GobToken';
 import FoodToken from './board/FoodToken';
+import FoodModal from './board/FoodModal';
 import { publicAssetPath } from '~/lib/assets';
-import { ingredients } from '~/types/constants';
-import type { BoardSpace, Ingredient, PantryFood } from '~/types/game';
+import type { BoardSpace, PantryFood } from '~/types/game';
 import { useGameStore } from '~/store/gameStore';
 
 const BOARD_SPACES = {
@@ -35,6 +35,7 @@ interface BoardDropZoneProps {
   gobPosition: boolean;
   foodTokens: PantryFood[];
   onAddFood: () => void;
+  onPrepareFood: (foodId: number) => void;
 }
 
 function BoardDropZone({
@@ -42,6 +43,7 @@ function BoardDropZone({
   gobPosition,
   foodTokens,
   onAddFood,
+  onPrepareFood,
 }: BoardDropZoneProps) {
   const isHand = id === 'leftHand' || id === 'rightHand';
   const { ref, isDropTarget } = useDroppable({
@@ -71,6 +73,7 @@ function BoardDropZone({
           food={{ ...token.food, image: publicAssetPath(token.food.image) }}
           draggable
           dragId={`food-token-${token.id}`}
+          onDoubleClick={() => onPrepareFood(token.id)}
           className='absolute h-[82%] w-[82%] rounded-full border border-amber-100/70'
         />
       ))}
@@ -99,16 +102,9 @@ function Board() {
   const foodTokens = useGameStore((state) => state.foodTokens);
   const moveGob = useGameStore((state) => state.moveGob);
   const moveFood = useGameStore((state) => state.moveFood);
-  const addFood = useGameStore((state) => state.addFood);
+  const prepareFood = useGameStore((state) => state.prepareFood);
   const [foodModalOpen, setFoodModalOpen] = useState(false);
   const [draggedFood, setDraggedFood] = useState<PantryFood | null>(null);
-  const nextFoodId = useRef(1);
-
-  const addFoodToPantry = (food: Ingredient) => {
-    const id = nextFoodId.current++;
-    addFood({ id, food });
-    setFoodModalOpen(false);
-  };
 
   return (
       <DragDropProvider
@@ -155,51 +151,14 @@ function Board() {
                 (token) => foodPositions[token.id] === space,
               )}
               onAddFood={() => setFoodModalOpen(true)}
+              onPrepareFood={prepareFood}
             />
           ))}
 
-          {foodModalOpen ? (
-            <div
-              className='absolute inset-0 z-50 flex items-center justify-center bg-stone-950/70 p-4 backdrop-blur-sm'
-              role='dialog'
-              aria-modal='true'
-              aria-label='Choose a food token'
-              onMouseDown={(event) => {
-                if (event.target === event.currentTarget)
-                  setFoodModalOpen(false);
-              }}>
-              <div className='flex max-h-[80%] w-[88%] flex-col rounded-2xl border border-amber-200/40 bg-stone-900 p-4 shadow-2xl'>
-                <div className='mb-3 flex items-center justify-between'>
-                  <h2 className='font-bold text-amber-100'>
-                    Choose an ingredient
-                  </h2>
-                  <button
-                    type='button'
-                    onClick={() => setFoodModalOpen(false)}
-                    aria-label='Close food token chooser'
-                    className='rounded-full px-3 py-1 text-xl text-amber-100 hover:bg-stone-700'>
-                    ×
-                  </button>
-                </div>
-                <div className='grid grid-cols-4 gap-3 overflow-y-auto pr-1'>
-                  {ingredients.map((food) => (
-                    <button
-                      key={food.name}
-                      type='button'
-                      onClick={() => addFoodToPantry(food)}
-                      className='aspect-square overflow-hidden rounded-lg border-2 border-transparent bg-stone-800 transition hover:border-amber-300 hover:scale-105'
-                      aria-label={`Add ${food.name} to pantry`}>
-                      <img
-                        src={publicAssetPath(food.image)}
-                        alt={food.name}
-                        className='h-full w-full object-cover'
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : null}
+          <FoodModal
+            open={foodModalOpen}
+            onClose={() => setFoodModalOpen(false)}
+          />
 
           <DragOverlay>
             {draggedFood ? (

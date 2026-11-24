@@ -13,7 +13,8 @@ export type ClientEvent =
   | { type: 'CONFIRM_BUY' }
   | { type: 'MOVE_GOB'; space: BoardSpace }
   | { type: 'MOVE_FOOD'; foodId: number; space: BoardSpace }
-  | { type: 'ADD_FOOD'; food: PantryFood };
+  | { type: 'ADD_FOOD'; food: PantryFood }
+  | { type: 'PREPARE_FOOD'; foodId: number; food: PantryFood };
 
 // ── Server → Client events ────────────────────────────────────────────────────
 

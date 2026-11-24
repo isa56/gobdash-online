@@ -211,4 +211,31 @@ function createDeck(): DeckOfCards {
 
 const deckOfCards: DeckOfCards = createDeck();
 
-export { ingredients, recipes, deckOfCards, createDeck };
+function getPreparedIngredient(food: Ingredient): Ingredient | null {
+  if (!food.hasPreparation || food.preparation !== 'UNPREPARED') return null;
+
+  const preparedImages: Record<string, string> = {
+    Eggs: 'images/game_tokens/ingredient_tokens/6_egg_2.webp',
+    Meat: 'images/game_tokens/ingredient_tokens/3_meat_2.webp',
+    Potato: 'images/game_tokens/ingredient_tokens/5_potato_2.webp',
+    Carrot: 'images/game_tokens/ingredient_tokens/4_carrot_2.webp',
+  };
+
+  const preparedImage = preparedImages[food.name];
+  if (!preparedImage) return null;
+
+  return new Ingredient(
+    `${food.name}_Prepared`,
+    preparedImage,
+    true,
+    'PREPARED',
+  );
+}
+
+export {
+  ingredients,
+  recipes,
+  deckOfCards,
+  createDeck,
+  getPreparedIngredient,
+};

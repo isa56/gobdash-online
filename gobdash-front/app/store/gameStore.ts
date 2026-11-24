@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { BoardSpace, Card, DeckOfCards, PantryFood } from '~/types/game';
 import { socketService } from '~/services/socketService';
 import type { ConnectionStatus, ServerGameStatePayload } from '~/types/server';
-import { createDeck } from '~/types/constants';
+import { createDeck, getPreparedIngredient } from '~/types/constants';
 import {
   ACTION_SLOT_PREFIX,
   CARD_TOKEN_PREFIX,
@@ -70,6 +70,7 @@ interface GameStore {
   moveGob: (space: BoardSpace) => void;
   moveFood: (foodId: number, space: BoardSpace) => void;
   addFood: (food: PantryFood) => void;
+  prepareFood: (foodId: number) => void;
 
   // ── Server integration ───────────────────────────────────────────────────────
   setRoomId: (roomId: string) => void;
@@ -281,6 +282,26 @@ export const useGameStore = create<GameStore>()((set, get) => ({
       foodPositions: { ...state.foodPositions, [food.id]: 'pantry' },
     }));
     socketService.send({ type: 'ADD_FOOD', food });
+  },
+
+  prepareFood: (foodId) => {
+    const token = get().foodTokens.find((item) => item.id === foodId);
+    if (!token) return;
+
+    const preparedFood = getPreparedIngredient(token.food);
+    if (!preparedFood) return;
+
+    const preparedToken = { id: foodId, food: preparedFood };
+    set((state) => ({
+      foodTokens: state.foodTokens.map((item) =>
+        item.id === foodId ? preparedToken : item,
+      ),
+    }));
+    socketService.send({
+      type: 'PREPARE_FOOD',
+      foodId,
+      food: preparedToken,
+    });
   },
 
   // ── Server integration ───────────────────────────────────────────────────────

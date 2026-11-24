@@ -5,6 +5,7 @@ interface FoodProps {
   food: FoodModel;
   selected?: boolean;
   onClick?: () => void;
+  onDoubleClick?: () => void;
   ref?: React.Ref<HTMLButtonElement>;
   style?: React.CSSProperties;
   className?: string;
@@ -16,6 +17,7 @@ export default function Food({
   food,
   selected = false,
   onClick,
+  onDoubleClick,
   ref,
   style,
   className,
@@ -33,6 +35,7 @@ export default function Food({
       ref={draggable ? draggableRef : ref}
       type='button'
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
       style={{ touchAction: draggable ? 'none' : undefined, ...style }}
       className={[
         'relative flex shrink-0 cursor-pointer flex-col overflow-hidden rounded-sm',
