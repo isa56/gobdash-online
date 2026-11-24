@@ -58,7 +58,7 @@ export default function Game() {
         </div>
       </div>
 
-      <div className='grid grid-cols-3 items-stretch gap-2 mx-1'>
+      <div className='grid grid-cols-3 items-start gap-2 mx-1'>
         {/* Card Table */}
         <div className='col-span-2'>
           <CardAndHand />

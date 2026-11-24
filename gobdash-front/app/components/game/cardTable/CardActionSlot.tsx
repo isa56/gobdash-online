@@ -31,7 +31,7 @@ function DroppableSlot({
     <div
       ref={ref}
       className={[
-        'group flex min-h-49 h-full items-center justify-center rounded-xl shrink-0',
+        'group flex h-45 items-center justify-center rounded-xl shrink-0',
         'border-2 border-dashed transition-all duration-200 ease-in-out',
         isCollapsible
           ? isDropTarget
@@ -56,7 +56,7 @@ function DroppableSlot({
             ].join(' '),
       ].join(' ')}>
       {playedCard ? (
-        <div className='relative h-full w-full flex items-center justify-center'>
+        <div className='relative h-full w-full flex items-center justify-center overflow-visible'>
           <Card card={playedCard} />
           {onClear && (
             <button

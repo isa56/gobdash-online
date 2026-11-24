@@ -161,7 +161,7 @@ function Board() {
             }}>
             <div className='flex max-h-[80%] w-[88%] flex-col rounded-2xl border border-amber-200/40 bg-stone-900 p-4 shadow-2xl'>
               <div className='mb-3 flex items-center justify-between'>
-                <h2 className='font-bold text-amber-100'>Choose a FoodToken</h2>
+                <h2 className='font-bold text-amber-100'>Choose an ingredient</h2>
                 <button
                   type='button'
                   onClick={() => setFoodModalOpen(false)}
