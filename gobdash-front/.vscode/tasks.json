@@ -9,15 +9,6 @@
 				"$tsc"
 			],
 			"group": "build"
-		},
-		{
-			"label": "Typecheck gobdash frontend 2",
-			"type": "shell",
-			"command": "npm run typecheck",
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": "build"
 		}
 	]
 }

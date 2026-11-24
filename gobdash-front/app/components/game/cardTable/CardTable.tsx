@@ -1,4 +1,4 @@
-import type { Card as CardModel } from '~/types/game';
+import type { Card as CardModel, CardMode } from '~/types/game';
 import CardActionSlot, { makeSlotId } from './CardActionSlot';
 import Card from './Card';
 import CodeTokenSlot from './CodeTokenSlot';
@@ -8,6 +8,8 @@ import { makeCardTokenId } from '~/lib/slots';
 interface CardTableProps {
   cards: CardModel[] | null;
   playedCards: Record<string, CardModel>;
+  /** Mode lookup sourced from the store; avoids relying on mutated card instances. */
+  cardModes: Record<number, CardMode>;
   onClearSlot: (slotId: string) => void;
   turnPhase: 'use' | 'buy';
   boughtCard: CardModel | null;
@@ -19,6 +21,7 @@ interface CardTableProps {
 export default function CardTable({
   cards,
   playedCards,
+  cardModes,
   onClearSlot,
   turnPhase,
   boughtCard,
@@ -34,6 +37,7 @@ export default function CardTable({
     return {
       id: slotId,
       playedCard,
+      playedCardMode: playedCard ? cardModes[playedCard.id] : undefined,
       disabled: isBuyPhase || (hasPlayedThisTurn && !playedCard),
       onClear: () => onClearSlot(slotId),
       isExpandable: !playedCard,

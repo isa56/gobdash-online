@@ -1,6 +1,6 @@
 import { useDroppable } from '@dnd-kit/react';
 import Card from './Card';
-import type { Card as CardModel } from '~/types/game';
+import type { Card as CardModel, CardMode } from '~/types/game';
 import { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID, makeSlotId } from '~/lib/slots';
 
 export { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID, makeSlotId };
@@ -8,6 +8,8 @@ export { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID, makeSlotId };
 interface CardActionSlotProps {
   id: string;
   playedCard: CardModel | null;
+  /** Mode override sourced from the store's cardModes map; avoids reading from the mutated card instance. */
+  playedCardMode?: CardMode;
   disabled?: boolean;
   isExpandable?: boolean;
   onClear?: () => void;
@@ -16,6 +18,7 @@ interface CardActionSlotProps {
 function DroppableSlot({
   id,
   playedCard,
+  playedCardMode,
   disabled = false,
   isExpandable = false,
   onClear,
@@ -57,7 +60,7 @@ function DroppableSlot({
       ].join(' ')}>
       {playedCard ? (
         <div className='relative h-full w-full flex items-center justify-center overflow-visible'>
-          <Card card={playedCard} />
+          <Card card={playedCard} mode={playedCardMode} />
           {onClear && (
             <button
               type='button'

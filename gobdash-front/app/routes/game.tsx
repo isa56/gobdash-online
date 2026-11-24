@@ -6,7 +6,7 @@ import RoomInfo from '~/components/room/RoomInfo';
 import { useGameState } from '~/hooks/useGameState';
 import { useRoom } from '~/hooks/useRoom';
 import Board from '~/components/game/Board';
-import CardAndHand from '~/components/game/CardHand';
+import CardHand from '~/components/game/CardHand';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -61,14 +61,13 @@ export default function Game() {
       <div className='grid grid-cols-3 items-start gap-2 mx-1'>
         {/* Card Table */}
         <div className='col-span-2'>
-          <CardAndHand />
+          <CardHand />
         </div>
 
         {/* Board */}
         <div className='h-full rounded-2xl overflow-hidden border border-stone-800/80 shadow-2xl'>
           <Board />
         </div>
-        {/* </div> */}
       </div>
     </div>
   );

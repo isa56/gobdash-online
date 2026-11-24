@@ -15,13 +15,14 @@ import Card from '~/components/game/cardTable/Card';
 import type { CodeTokenType } from '~/components/game/cardTable/CodeToken';
 import { useGameState } from '~/hooks/useGameState';
 
-function CardAndHand() {
+function CardHand() {
   const {
     hand,
     cardTableCards,
     discardPile,
     deckCount,
     playedCards,
+    cardModes,
     bought,
     placedTokens,
     draggingCard,
@@ -105,6 +106,7 @@ function CardAndHand() {
           <CardTable
             cards={cardTableCards}
             playedCards={playedCards}
+            cardModes={cardModes}
             onClearSlot={handleClearSlot}
             turnPhase={turnPhase}
             boughtCard={bought?.source === 'table' ? bought.card : null}
@@ -157,4 +159,4 @@ function CardAndHand() {
   );
 }
 
-export default CardAndHand;
+export default CardHand;

@@ -95,11 +95,13 @@ export type ExecutionStep = {
   delivered: boolean; // Indicates whether the recipe was delivered to the customer
 };
 
+export type CardMode = 'normal' | 'staged' | 'discarded';
+
 export class Card {
   id: number;
   type: CardTypes;
   image: string;
-  mode: 'normal' | 'staged' | 'discarded' = 'normal';
+  mode: CardMode = 'normal';
 
   constructor(id: number, type: CardTypes) {
     this.id = id;

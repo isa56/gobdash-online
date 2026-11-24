@@ -1,7 +1,9 @@
-import type { Card as CardModel } from '~/types/game';
+import type { Card as CardModel, CardMode } from '~/types/game';
 
 interface CardProps {
   card: CardModel;
+  /** Override the mode for display without mutating the card instance. */
+  mode?: CardMode;
   selected?: boolean;
   onClick?: () => void;
   ref?: React.Ref<HTMLButtonElement>;
@@ -11,12 +13,14 @@ interface CardProps {
 
 export default function Card({
   card,
+  mode,
   selected = false,
   onClick,
   ref,
   style,
   className,
 }: CardProps) {
+  const resolvedMode = mode ?? card.mode;
   return (
     <button
       ref={ref}
@@ -28,8 +32,8 @@ export default function Card({
         'shadow-md outline-2 outline-transparent',
         'transition-all duration-150 ease-out',
         'hover:-translate-y-1 hover:shadow-xl',
-        card.mode === 'normal' || card.mode === 'staged' ? 'w-32' : '',
-        card.mode === 'discarded' ? 'w-26' : '',
+        resolvedMode === 'normal' || resolvedMode === 'staged' ? 'w-32' : '',
+        resolvedMode === 'discarded' ? 'w-26' : '',
         selected
           ? 'outline-amber-400 ring-2 ring-amber-400 ring-offset-1'
           : 'hover:outline-amber-300',

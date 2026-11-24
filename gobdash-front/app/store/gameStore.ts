@@ -11,6 +11,8 @@ import type { CodeTokenType } from '~/components/game/cardTable/CodeToken';
 
 export type TurnPhase = 'use' | 'buy';
 export type BoughtSelection = { card: Card; source: 'table' | 'deck' } | null;
+/** Tracks visual display mode per card id without mutating shared card instances. */
+export type CardMode = 'normal' | 'staged' | 'discarded';
 
 interface GameStore {
   // ── Connection ──────────────────────────────────────────────────────────────
@@ -24,6 +26,8 @@ interface GameStore {
   discardPile: Card[];
   deckCount: number;
   playedCards: Record<string, Card>;
+  /** Lookup map from card id → display mode. Never mutates card instances. */
+  cardModes: Record<number, CardMode>;
   bought: BoughtSelection;
   placedTokens: Record<number, CodeTokenType>;
   draggingCard: Card | null;
@@ -77,6 +81,7 @@ const initialGameState = {
   discardPile: [],
   deckCount: 0,
   playedCards: {},
+  cardModes: {} as Record<number, CardMode>,
   bought: null,
   placedTokens: {},
   draggingCard: null,
@@ -120,21 +125,18 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     if (hasStaged && !playedCards[targetId]) return;
 
     const existingCard = playedCards[targetId];
+    const newMode: CardMode =
+      targetId === DISCARD_SLOT_ID ? 'discarded' : 'staged';
+
     set((state) => ({
       hand: existingCard
-        ? [
-            ...state.hand.filter((c) => c.id !== card.id),
-            Object.assign(existingCard, { mode: 'normal' as const }),
-          ]
+        ? [...state.hand.filter((c) => c.id !== card.id), existingCard]
         : state.hand.filter((c) => c.id !== card.id),
-      playedCards: {
-        ...state.playedCards,
-        [targetId]: Object.assign(card, {
-          mode:
-            targetId === DISCARD_SLOT_ID
-              ? ('discarded' as const)
-              : ('staged' as const),
-        }),
+      playedCards: { ...state.playedCards, [targetId]: card },
+      cardModes: {
+        ...state.cardModes,
+        ...(existingCard ? { [existingCard.id]: 'normal' as const } : {}),
+        [card.id]: newMode,
       },
     }));
   },
@@ -145,9 +147,12 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     set((state) => {
       const next = { ...state.playedCards };
       delete next[slotId];
+      const nextModes = { ...state.cardModes };
+      delete nextModes[card.id];
       return {
-        hand: [...state.hand, Object.assign(card, { mode: 'normal' as const })],
+        hand: [...state.hand, card],
         playedCards: next,
+        cardModes: nextModes,
       };
     });
   },
@@ -162,14 +167,15 @@ export const useGameStore = create<GameStore>()((set, get) => ({
       set((state) => ({
         discardPile: [...state.discardPile, card],
         playedCards: {},
+        cardModes: {},
         turnPhase: 'buy',
       }));
     } else {
       const slotIndex = parseInt(slotId.replace(`${ACTION_SLOT_PREFIX}-`, ''), 10);
       set((state) => {
         const next = [...state.cardTableCards];
-        next.splice(slotIndex, 0, Object.assign(card, { mode: 'normal' as const }));
-        return { cardTableCards: next, playedCards: {}, turnPhase: 'buy' };
+        next.splice(slotIndex, 0, card);
+        return { cardTableCards: next, playedCards: {}, cardModes: {}, turnPhase: 'buy' };
       });
     }
   },
