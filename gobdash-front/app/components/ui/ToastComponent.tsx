@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from 'motion/react';
 import { Toast, ToastToggle } from 'flowbite-react';
 import { BsBan, BsCheckLg, BsExclamation, BsInfo } from 'react-icons/bs';
 
@@ -36,24 +35,26 @@ export default function ToastComponent({ text, type, show, onClose }: ToastCompo
   const { border, iconBg, icon } = typeStyles[type];
 
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0, x: 80 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 80 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+    <div
+      role='status'
+      aria-live='polite'
+      className={[
+        'transition-all duration-300 ease-out',
+        show
+          ? 'translate-x-0 opacity-100'
+          : 'pointer-events-none translate-x-20 opacity-0',
+      ].join(' ')}
+    >
+      <Toast className='border border-sunlit-clay-dark bg-sunlit-clay shadow-lg'>
+        <div
+          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${border} ${iconBg}`}
         >
-          <Toast className={`bg-sunlit-clay border border-sunlit-clay-dark shadow-lg`}>
-            <div className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${border} ${iconBg}`}>
-              {icon}
-            </div>
-            <div className='ml-3 text-sm font-bold pr-2 text-espresso'>{text}</div>
-            <ToastToggle onDismiss={onClose} />
-          </Toast>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          {icon}
+        </div>
+        <div className='ml-3 pr-2 text-sm font-bold text-espresso'>{text}</div>
+        <ToastToggle onDismiss={onClose} />
+      </Toast>
+    </div>
   );
 }
 
