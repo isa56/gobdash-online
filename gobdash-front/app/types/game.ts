@@ -3,7 +3,6 @@ import { publicAssetPath } from '~/lib/assets';
 const baseCardImagePath = publicAssetPath('images/cards/');
 const baseTokenImagePath = publicAssetPath('images/game_tokens/');
 
-
 export enum CardTypes {
   GO_SALON = 'GO_SALON',
   GO_STOVE = 'GO_STOVE',
@@ -23,15 +22,18 @@ type PreparationStatus = 'PREPARED' | 'UNPREPARED' | null;
 
 export class Recipe {
   name: string;
+  image: string;
   ingredients: Ingredient[];
   preparationSteps: PreparationStep[] = [];
 
   constructor(
     name: string,
+    image: string,
     ingredients: Ingredient[],
     preparationSteps: PreparationStep[] = [],
   ) {
     this.name = name;
+    this.image = image;
     this.ingredients = ingredients;
     this.preparationSteps = preparationSteps;
   }
@@ -61,15 +63,18 @@ export class Recipe {
 
 export class Ingredient {
   name: string;
+  image: string;
   hasPreparation: boolean;
   preparation: PreparationStatus;
 
   constructor(
     name: string,
+    image: string,
     hasPreparation: boolean,
     preparation?: 'PREPARED' | 'UNPREPARED' | null,
   ) {
     this.name = name;
+    this.image = image;
     this.hasPreparation = hasPreparation;
     if (preparation === undefined) {
       this.preparation = hasPreparation ? 'UNPREPARED' : null;

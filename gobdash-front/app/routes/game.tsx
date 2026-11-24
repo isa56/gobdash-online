@@ -58,14 +58,14 @@ export default function Game() {
         </div>
       </div>
 
-      <div className='grid grid-cols-3 gap-2 mx-1'>
+      <div className='grid grid-cols-3 items-stretch gap-2 mx-1'>
         {/* Card Table */}
         <div className='col-span-2'>
           <CardAndHand />
         </div>
 
         {/* Board */}
-        <div className='rounded-2xl overflow-hidden border border-stone-800/80 shadow-2xl'>
+        <div className='h-full rounded-2xl overflow-hidden border border-stone-800/80 shadow-2xl'>
           <Board />
         </div>
         {/* </div> */}
