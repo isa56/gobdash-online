@@ -7,6 +7,7 @@ import { useGameState } from '~/hooks/useGameState';
 import { useRoom } from '~/hooks/useRoom';
 import Board from '~/components/game/Board';
 import CardHand from '~/components/game/CardHand';
+import ToastComponent from '~/components/ui/ToastComponent';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -27,6 +28,9 @@ export default function Game() {
     turnPhase,
     turnNumber,
     numberOfPlayers,
+    connectionStatus,
+    errorMessage,
+    setErrorMessage,
     mounted,
     initLocalGame,
     resetGame,
@@ -45,6 +49,19 @@ export default function Game() {
 
   return (
     <div className='pb-12 w-full'>
+      <div className='fixed bottom-4 right-4 z-50'>
+        <ToastComponent
+          text={
+            errorMessage ??
+            (connectionStatus === 'error'
+              ? 'Connection to the game server failed.'
+              : '')
+          }
+          type='error'
+          show={errorMessage !== null || connectionStatus === 'error'}
+          onClose={() => setErrorMessage(null)}
+        />
+      </div>
       {/* Header */}
       <div>
         {/* Room Information */}

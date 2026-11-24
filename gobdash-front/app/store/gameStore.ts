@@ -20,6 +20,7 @@ interface GameStore {
   roomId: string | null;
   playerId: string | null;
   connectionStatus: ConnectionStatus;
+  errorMessage: string | null;
 
   // ── Core game state ─────────────────────────────────────────────────────────
   hand: Card[];
@@ -73,7 +74,11 @@ interface GameStore {
   // ── Server integration ───────────────────────────────────────────────────────
   setRoomId: (roomId: string) => void;
   setPlayerId: (playerId: string) => void;
+  setNumberOfPlayers: (
+    numberOfPlayers: number | ((current: number) => number),
+  ) => void;
   setConnectionStatus: (status: ConnectionStatus) => void;
+  setErrorMessage: (message: string | null) => void;
   /** Merge a partial game state received from the server. */
   applyServerState: (payload: ServerGameStatePayload) => void;
 }
@@ -82,6 +87,7 @@ const initialGameState = {
   roomId: null,
   playerId: null,
   connectionStatus: 'disconnected' as ConnectionStatus,
+  errorMessage: null as string | null,
 
   hand: [],
   cardTableCards: [],
@@ -280,6 +286,14 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   // ── Server integration ───────────────────────────────────────────────────────
   setRoomId: (roomId) => set({ roomId }),
   setPlayerId: (playerId) => set({ playerId }),
+  setNumberOfPlayers: (numberOfPlayers) =>
+    set((state) => ({
+      numberOfPlayers:
+        typeof numberOfPlayers === 'function'
+          ? numberOfPlayers(state.numberOfPlayers)
+          : numberOfPlayers,
+    })),
   setConnectionStatus: (connectionStatus) => set({ connectionStatus }),
+  setErrorMessage: (errorMessage) => set({ errorMessage }),
   applyServerState: (payload) => set(payload),
 }));

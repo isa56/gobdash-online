@@ -2,6 +2,8 @@ import type { ClientEvent, ServerEvent } from '~/types/server';
 import { appConfig } from '~/config';
 
 type EventHandler = (event: ServerEvent) => void;
+type SocketConnectionStatus = 'disconnected' | 'connected' | 'error';
+type ConnectionStatusHandler = (status: SocketConnectionStatus) => void;
 
 /**
  * WebSocket client wrapper.
@@ -12,6 +14,7 @@ type EventHandler = (event: ServerEvent) => void;
 class SocketService {
   private ws: WebSocket | null = null;
   private handlers: Map<ServerEvent['type'], Set<EventHandler>> = new Map();
+  private connectionStatusHandlers = new Set<ConnectionStatusHandler>();
 
   connect(roomId: string, playerId: string): void {
     if (appConfig.mockMode) {
@@ -25,6 +28,7 @@ class SocketService {
 
     this.ws.onopen = () => {
       console.info('[SocketService] Connected to', url);
+      this.emitConnectionStatus('connected');
     };
 
     this.ws.onmessage = (e: MessageEvent<string>) => {
@@ -38,10 +42,12 @@ class SocketService {
 
     this.ws.onclose = () => {
       console.info('[SocketService] Disconnected');
+      this.emitConnectionStatus('disconnected');
     };
 
     this.ws.onerror = (e) => {
       console.error('[SocketService] Error:', e);
+      this.emitConnectionStatus('error');
     };
   }
 
@@ -81,8 +87,20 @@ class SocketService {
     this.handlers.get(type)?.delete(handler as EventHandler);
   }
 
+  onConnectionStatus(handler: ConnectionStatusHandler): void {
+    this.connectionStatusHandlers.add(handler);
+  }
+
+  offConnectionStatus(handler: ConnectionStatusHandler): void {
+    this.connectionStatusHandlers.delete(handler);
+  }
+
   private emit(event: ServerEvent): void {
     this.handlers.get(event.type)?.forEach((h) => h(event));
+  }
+
+  private emitConnectionStatus(status: SocketConnectionStatus): void {
+    this.connectionStatusHandlers.forEach((handler) => handler(status));
   }
 }
 

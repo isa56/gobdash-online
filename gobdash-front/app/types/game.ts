@@ -39,25 +39,23 @@ export class Recipe {
   }
 
   checkRecipeCompletion(ingredientStates: Ingredient[]): boolean {
-    // Check if all required ingredients are present in the ingredientStates
-    this.ingredients.forEach((requiredIngredient) => {
+    return this.ingredients.every((requiredIngredient) => {
       const matchingIngredient = ingredientStates.find(
         (ingredient) => ingredient.name === requiredIngredient.name,
       );
       if (!matchingIngredient) {
-        return false; // Required ingredient is missing
+        return false;
       }
 
-      // If the required ingredient has preparation, check if the preparation status matches
       if (
         requiredIngredient.hasPreparation &&
         matchingIngredient.preparation !== requiredIngredient.preparation
       ) {
-        return false; // Preparation status does not match
+        return false;
       }
-    });
 
-    return true; // All required ingredients are present
+      return true;
+    });
   }
 }
 

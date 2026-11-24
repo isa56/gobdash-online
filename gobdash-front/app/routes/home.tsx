@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { Route } from './+types/home';
 import { roomService } from '~/services/roomService';
+import { useGameStore } from '~/store/gameStore';
+import ToastComponent from '~/components/ui/ToastComponent';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -15,12 +17,18 @@ export default function Home() {
   const [joinCode, setJoinCode] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const setPlayerId = useGameStore((state) => state.setPlayerId);
 
   async function handleCreateGame() {
     try {
       setIsCreating(true);
-      const { roomId } = await roomService.createRoom();
+      setErrorMessage(null);
+      const { roomId, playerId } = await roomService.createRoom();
+      setPlayerId(playerId);
       navigate(`/game/${roomId}`);
+    } catch (error: unknown) {
+      setErrorMessage(error instanceof Error ? error.message : 'Unable to create room.');
     } finally {
       setIsCreating(false);
     }
@@ -31,8 +39,13 @@ export default function Home() {
     if (!joinCode.trim()) return;
     try {
       setIsJoining(true);
-      await roomService.joinRoom(joinCode.trim());
-      navigate(`/game/${joinCode.trim()}`);
+      setErrorMessage(null);
+      const roomId = joinCode.trim();
+      const { playerId } = await roomService.joinRoom(roomId);
+      setPlayerId(playerId);
+      navigate(`/game/${roomId}`);
+    } catch (error: unknown) {
+      setErrorMessage(error instanceof Error ? error.message : 'Unable to join room.');
     } finally {
       setIsJoining(false);
     }
@@ -94,6 +107,14 @@ export default function Home() {
             {isJoining ? 'Joining Room...' : 'Join Game'}
           </button>
         </form>
+      </div>
+      <div className='fixed bottom-4 right-4 z-50'>
+        <ToastComponent
+          text={errorMessage ?? ''}
+          type='error'
+          show={errorMessage !== null}
+          onClose={() => setErrorMessage(null)}
+        />
       </div>
     </div>
   );
