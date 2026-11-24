@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import type { Card, DeckOfCards } from '~/types/game';
+import type { BoardSpace, Card, DeckOfCards, PantryFood } from '~/types/game';
+import { socketService } from '~/services/socketService';
 import type { ConnectionStatus, ServerGameStatePayload } from '~/types/server';
 import { createDeck } from '~/types/constants';
 import {
@@ -32,6 +33,9 @@ interface GameStore {
   placedTokens: Record<number, CodeTokenType>;
   draggingCard: Card | null;
   localDeck: DeckOfCards | null;
+  gobSpace: BoardSpace;
+  foodPositions: Record<number, BoardSpace>;
+  foodTokens: PantryFood[];
 
   // ── Turn flow ────────────────────────────────────────────────────────────────
   turnPhase: TurnPhase;
@@ -62,6 +66,9 @@ interface GameStore {
   handleConfirmBuy: () => void;
   handleTokenDrop: (targetId: string, token: CodeTokenType) => void;
   handleClearToken: (cardId: number) => void;
+  moveGob: (space: BoardSpace) => void;
+  moveFood: (foodId: number, space: BoardSpace) => void;
+  addFood: (food: PantryFood) => void;
 
   // ── Server integration ───────────────────────────────────────────────────────
   setRoomId: (roomId: string) => void;
@@ -86,6 +93,9 @@ const initialGameState = {
   placedTokens: {},
   draggingCard: null,
   localDeck: null,
+  gobSpace: 'salon' as BoardSpace,
+  foodPositions: {} as Record<number, BoardSpace>,
+  foodTokens: [] as PantryFood[],
 
   turnPhase: 'use' as TurnPhase,
   turnNumber: 1,
@@ -245,6 +255,26 @@ export const useGameStore = create<GameStore>()((set, get) => ({
       delete next[cardId];
       return { placedTokens: next };
     });
+  },
+
+  moveGob: (space) => {
+    set({ gobSpace: space });
+    socketService.send({ type: 'MOVE_GOB', space });
+  },
+
+  moveFood: (foodId, space) => {
+    set((state) => ({
+      foodPositions: { ...state.foodPositions, [foodId]: space },
+    }));
+    socketService.send({ type: 'MOVE_FOOD', foodId, space });
+  },
+
+  addFood: (food) => {
+    set((state) => ({
+      foodTokens: [...state.foodTokens, food],
+      foodPositions: { ...state.foodPositions, [food.id]: 'pantry' },
+    }));
+    socketService.send({ type: 'ADD_FOOD', food });
   },
 
   // ── Server integration ───────────────────────────────────────────────────────

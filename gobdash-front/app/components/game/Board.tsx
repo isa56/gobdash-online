@@ -5,7 +5,8 @@ import GobToken from './board/GobToken';
 import FoodToken from './board/FoodToken';
 import { publicAssetPath } from '~/lib/assets';
 import { ingredients } from '~/types/constants';
-import type { Ingredient } from '~/types/game';
+import type { BoardSpace, Ingredient, PantryFood } from '~/types/game';
+import { useGameStore } from '~/store/gameStore';
 
 const BOARD_SPACES = {
   pantry: 'Pantry',
@@ -17,10 +18,9 @@ const BOARD_SPACES = {
   rightHand: 'Right Hand',
 } as const;
 
-type BoardSpace = keyof typeof BOARD_SPACES;
-type PantryFood = { id: number; food: Ingredient };
+type BoardSpaceName = keyof typeof BOARD_SPACES;
 
-const boardSpacePositions: Record<BoardSpace, { left: string; top: string }> = {
+const boardSpacePositions: Record<BoardSpaceName, { left: string; top: string }> = {
   pantry: { left: '23%', top: '60%' },
   stove: { left: '50%', top: '43%' },
   countertop: { left: '82%', top: '60%' },
@@ -31,7 +31,7 @@ const boardSpacePositions: Record<BoardSpace, { left: string; top: string }> = {
 };
 
 interface BoardDropZoneProps {
-  id: BoardSpace;
+  id: BoardSpaceName;
   gobPosition: boolean;
   foodTokens: PantryFood[];
   onAddFood: () => void;
@@ -94,19 +94,19 @@ function BoardDropZone({
 }
 
 function Board() {
-  const [gobSpace, setGobSpace] = useState<BoardSpace>('salon');
+  const gobSpace = useGameStore((state) => state.gobSpace);
+  const foodPositions = useGameStore((state) => state.foodPositions);
+  const foodTokens = useGameStore((state) => state.foodTokens);
+  const moveGob = useGameStore((state) => state.moveGob);
+  const moveFood = useGameStore((state) => state.moveFood);
+  const addFood = useGameStore((state) => state.addFood);
   const [foodModalOpen, setFoodModalOpen] = useState(false);
-  const [foodPositions, setFoodPositions] = useState<
-    Record<number, BoardSpace>
-  >({});
-  const [foodTokens, setFoodTokens] = useState<PantryFood[]>([]);
   const [draggedFood, setDraggedFood] = useState<PantryFood | null>(null);
   const nextFoodId = useRef(1);
 
   const addFoodToPantry = (food: Ingredient) => {
     const id = nextFoodId.current++;
-    setFoodTokens((current) => [...current, { id, food }]);
-    setFoodPositions((current) => ({ ...current, [id]: 'pantry' }));
+    addFood({ id, food });
     setFoodModalOpen(false);
   };
 
@@ -132,13 +132,13 @@ function Board() {
 
           if (sourceId === 'gob-token') {
             if (space !== 'leftHand' && space !== 'rightHand')
-              setGobSpace(space);
+              moveGob(space);
             return;
           }
 
           if (sourceId?.startsWith('food-token-')) {
             const id = Number(sourceId.replace('food-token-', ''));
-            setFoodPositions((current) => ({ ...current, [id]: space }));
+            moveFood(id, space);
           }
         }}>
         <div
@@ -146,7 +146,7 @@ function Board() {
           style={{
             backgroundImage: `url("${publicAssetPath('images/board/board.webp')}")`,
           }}>
-          {(Object.keys(BOARD_SPACES) as BoardSpace[]).map((space) => (
+          {(Object.keys(BOARD_SPACES) as BoardSpaceName[]).map((space) => (
             <BoardDropZone
               key={space}
               id={space}

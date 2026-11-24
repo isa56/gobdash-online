@@ -86,6 +86,17 @@ export class Ingredient {
 
 export type GamePhase = 'PLANNING' | 'EXECUTING' | 'DEBUGGING';
 
+export type BoardSpace =
+  | 'pantry'
+  | 'stove'
+  | 'countertop'
+  | 'salon'
+  | 'delivery'
+  | 'leftHand'
+  | 'rightHand';
+
+export type PantryFood = { id: number; food: Ingredient };
+
 export type ExecutionStep = {
   stepIndex: number; // Card Index of the list
   gobPlacement: CardTypes; // Represents the card that Gob placed
