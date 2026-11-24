@@ -7,6 +7,9 @@ interface CodeTokenSlotProps {
   token: CodeTokenType | null;
   disabled?: boolean;
   onClear: () => void;
+  selectedToken?: CodeTokenType;
+  onSelectToken?: (token: CodeTokenType) => void;
+  onMoveToken?: (targetId: string) => void;
 }
 
 const tokenImages: Record<CodeTokenType, string> = {
@@ -19,6 +22,9 @@ export default function CodeTokenSlot({
   token,
   disabled = false,
   onClear,
+  selectedToken,
+  onSelectToken,
+  onMoveToken,
 }: CodeTokenSlotProps) {
   const { ref: dropRef, isDropTarget } = useDroppable({
     id,
@@ -35,6 +41,18 @@ export default function CodeTokenSlot({
   return (
     <div
       ref={dropRef}
+      role={selectedToken ? 'button' : 'group'}
+      tabIndex={selectedToken ? 0 : undefined}
+      aria-label={selectedToken ? `Place selected token in ${id}` : `${id} code token slot`}
+      onClick={() => {
+        if (selectedToken && onMoveToken) onMoveToken(id);
+      }}
+      onKeyDown={(event) => {
+        if (selectedToken && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault();
+          onMoveToken?.(id);
+        }
+      }}
       className={[
         'group absolute -top-4 left-1/2 z-10 flex h-10 w-10 -translate-x-1/2',
         'items-center justify-center rounded-full border-2 border-dashed transition-all',
@@ -48,20 +66,35 @@ export default function CodeTokenSlot({
       ].join(' ')}>
       {token ? (
         <>
-          <img
-            src={tokenImages[token]}
-            alt={`${token} code token`}
+          <button
+            type='button'
             ref={dragRef}
-            className={[
-              'h-32 object-contain cursor-grab active:cursor-grabbing transition-opacity duration-100',
-              isDragging ? 'opacity-30' : 'opacity-100',
-            ].join(' ')}
-            draggable={false}
-          />
+            onClick={(event) => {
+              event.stopPropagation();
+              onSelectToken?.(token);
+            }}
+            aria-label={`Select ${token} code token`}
+            aria-pressed={selectedToken === token}
+            className={selectedToken === token
+              ? 'rounded-full ring-4 ring-amber-400 scale-105'
+              : 'rounded-full'}>
+            <img
+              src={tokenImages[token]}
+              alt={`${token} code token`}
+              className={[
+                'h-32 object-contain cursor-grab active:cursor-grabbing transition-opacity duration-100',
+                isDragging ? 'opacity-30' : 'opacity-100',
+              ].join(' ')}
+              draggable={false}
+            />
+          </button>
           {!disabled && (
             <button
               type='button'
-              onClick={onClear}
+              onClick={(event) => {
+                event.stopPropagation();
+                onClear();
+              }}
               aria-label='Remove code token'
               className='absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow hover:bg-red-600 cursor-pointer'>
               X

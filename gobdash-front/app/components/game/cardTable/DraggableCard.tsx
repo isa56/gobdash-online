@@ -5,9 +5,16 @@ import type { Card as CardModel } from '~/types/game';
 interface DraggableCardProps {
   card: CardModel;
   disabled?: boolean;
+  selected?: boolean;
+  onSelect?: () => void;
 }
 
-export default function DraggableCard({ card, disabled = false }: DraggableCardProps) {
+export default function DraggableCard({
+  card,
+  disabled = false,
+  selected = false,
+  onSelect,
+}: DraggableCardProps) {
   const { ref, isDragging } = useDraggable({
     id: card.id,
     data: { card },
@@ -19,6 +26,8 @@ export default function DraggableCard({ card, disabled = false }: DraggableCardP
     <Card
       ref={ref}
       card={card}
+      selected={selected}
+      onClick={disabled ? undefined : onSelect}
       style={{ touchAction: 'none' }}
       className={[
         'transition-opacity duration-100',

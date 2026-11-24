@@ -13,6 +13,8 @@ interface CardActionSlotProps {
   disabled?: boolean;
   isExpandable?: boolean;
   onClear?: () => void;
+  canReceiveSelection?: boolean;
+  onSelectDestination?: () => void;
 }
 
 function DroppableSlot({
@@ -22,6 +24,8 @@ function DroppableSlot({
   disabled = false,
   isExpandable = false,
   onClear,
+  canReceiveSelection = false,
+  onSelectDestination,
 }: CardActionSlotProps) {
   const { ref, isDropTarget } = useDroppable({
     id,
@@ -33,6 +37,18 @@ function DroppableSlot({
   return (
     <div
       ref={ref}
+      role={canReceiveSelection ? 'button' : 'group'}
+      tabIndex={canReceiveSelection ? 0 : undefined}
+      aria-label={canReceiveSelection ? `Move selected card to ${id}` : `${id} card slot`}
+      onClick={() => {
+        if (canReceiveSelection) onSelectDestination?.();
+      }}
+      onKeyDown={(event) => {
+        if (canReceiveSelection && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault();
+          onSelectDestination?.();
+        }
+      }}
       className={[
         'group flex h-45 items-center justify-center rounded-xl shrink-0',
         'border-2 border-dashed transition-all duration-200 ease-in-out',
@@ -64,7 +80,10 @@ function DroppableSlot({
           {onClear && (
             <button
               type='button'
-              onClick={onClear}
+              onClick={(event) => {
+                event.stopPropagation();
+                onClear();
+              }}
               aria-label='Remove played card'
               className='absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow hover:bg-red-600 cursor-pointer'>
               X

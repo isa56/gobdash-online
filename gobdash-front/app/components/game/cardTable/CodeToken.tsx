@@ -6,9 +6,11 @@ export type CodeTokenType = 'program' | 'error';
 interface CodeTokenProps {
   type: CodeTokenType;
   id: string;
+  selected?: boolean;
+  onSelect?: () => void;
 }
 
-function CodeToken({ type, id }: CodeTokenProps) {
+function CodeToken({ type, id, selected = false, onSelect }: CodeTokenProps) {
   const tokenImage =
     type === 'program'
       ? publicAssetPath('images/game_tokens/code_token.webp')
@@ -22,7 +24,16 @@ function CodeToken({ type, id }: CodeTokenProps) {
   });
 
   return (
-    <div className='shrink-0'>
+    <button
+      type='button'
+      ref={ref}
+      onClick={onSelect}
+      aria-label={`Select ${tokenAlt}`}
+      aria-pressed={selected}
+      className={[
+        'shrink-0 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-300',
+        selected ? 'ring-4 ring-amber-400 scale-105' : '',
+      ].join(' ')}>
       <img
         src={tokenImage}
         alt={tokenAlt}
@@ -31,9 +42,9 @@ function CodeToken({ type, id }: CodeTokenProps) {
           'h-22 text-shadow-md cursor-grab active:cursor-grabbing transition-opacity duration-100',
           isDragging ? 'opacity-30' : 'opacity-100',
         ].join(' ')}
-        ref={ref}
+        draggable={false}
       />
-    </div>
+    </button>
   );
 }
 

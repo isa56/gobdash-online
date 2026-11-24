@@ -30,10 +30,19 @@ const boardSpacePositions: Record<BoardSpaceName, { left: string; top: string }>
   rightHand: { left: '85%', top: '8%' },
 };
 
+type BoardSelection =
+  | { kind: 'gob' }
+  | { kind: 'food'; foodId: number }
+  | null;
+
 interface BoardDropZoneProps {
   id: BoardSpaceName;
   gobPosition: boolean;
   foodTokens: PantryFood[];
+  selection: BoardSelection;
+  onSelectGob: () => void;
+  onSelectFood: (foodId: number) => void;
+  onMoveSelection: (space: BoardSpaceName) => void;
   onAddFood: () => void;
   onPrepareFood: (foodId: number) => void;
 }
@@ -42,6 +51,10 @@ function BoardDropZone({
   id,
   gobPosition,
   foodTokens,
+  selection,
+  onSelectGob,
+  onSelectFood,
+  onMoveSelection,
   onAddFood,
   onPrepareFood,
 }: BoardDropZoneProps) {
@@ -53,11 +66,27 @@ function BoardDropZone({
 
   const position = boardSpacePositions[id];
 
+  const selectOrMove = () => {
+    if (selection) {
+      onMoveSelection(id);
+    }
+  };
+
   return (
     <div
       ref={ref}
-      role='group'
-      aria-label={BOARD_SPACES[id]}
+      role={selection ? 'button' : 'group'}
+      tabIndex={selection ? 0 : undefined}
+      aria-label={selection
+        ? `Move selected object to ${BOARD_SPACES[id]}`
+        : BOARD_SPACES[id]}
+      onClick={selectOrMove}
+      onKeyDown={(event) => {
+        if (selection && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault();
+          onMoveSelection(id);
+        }
+      }}
       className={[
         'absolute z-10 flex h-[14%] w-[14%] -translate-x-1/2 -translate-y-1/2',
         'items-center justify-center rounded-full border-3 border-dashed shadow-lg transition-all',
@@ -66,13 +95,26 @@ function BoardDropZone({
           : 'border-stone-100 bg-stone-950/20',
       ].join(' ')}
       style={{ left: position.left, top: position.top }}>
-      {gobPosition ? <GobToken /> : null}
+      {gobPosition ? (
+        <GobToken
+          onClick={(event) => {
+            event.stopPropagation();
+            onSelectGob();
+          }}
+          selected={selection?.kind === 'gob'}
+        />
+      ) : null}
       {foodTokens.map((token) => (
         <FoodToken
           key={token.id}
           food={{ ...token.food, image: publicAssetPath(token.food.image) }}
           draggable
           dragId={`food-token-${token.id}`}
+          selected={selection?.kind === 'food' && selection.foodId === token.id}
+          onClick={(event) => {
+            event.stopPropagation();
+            onSelectFood(token.id);
+          }}
           onDoubleClick={() => onPrepareFood(token.id)}
           className='absolute h-[82%] w-[82%] rounded-full border border-amber-100/70'
         />
@@ -80,7 +122,10 @@ function BoardDropZone({
       {id === 'pantry' ? (
         <button
           type='button'
-          onClick={onAddFood}
+          onClick={(event) => {
+            event.stopPropagation();
+            onAddFood();
+          }}
           aria-label='Choose a food token for the pantry'
           className='absolute -left-[72%] flex h-10 w-10 items-center justify-center rounded-full border-2 border-amber-200 bg-fern text-xl font-bold text-white shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-300'>
           +
@@ -105,6 +150,7 @@ function Board() {
   const prepareFood = useGameStore((state) => state.prepareFood);
   const [foodModalOpen, setFoodModalOpen] = useState(false);
   const [draggedFood, setDraggedFood] = useState<PantryFood | null>(null);
+  const [selection, setSelection] = useState<BoardSelection>(null);
 
   return (
       <DragDropProvider
@@ -116,6 +162,7 @@ function Board() {
           }
         }}
         onDragEnd={(event) => {
+          setSelection(null);
           setDraggedFood(null);
           if (event.canceled) return;
 
@@ -142,6 +189,11 @@ function Board() {
           style={{
             backgroundImage: `url("${publicAssetPath('images/board/board.webp')}")`,
           }}>
+          <p className='sr-only' aria-live='polite'>
+            {selection
+              ? 'Object selected. Choose a destination area.'
+              : 'No object selected.'}
+          </p>
           {(Object.keys(BOARD_SPACES) as BoardSpaceName[]).map((space) => (
             <BoardDropZone
               key={space}
@@ -150,6 +202,31 @@ function Board() {
               foodTokens={foodTokens.filter(
                 (token) => foodPositions[token.id] === space,
               )}
+              selection={selection}
+              onSelectGob={() =>
+                setSelection((current) =>
+                  current?.kind === 'gob' ? null : { kind: 'gob' },
+                )
+              }
+              onSelectFood={(foodId) =>
+                setSelection((current) =>
+                  current?.kind === 'food' && current.foodId === foodId
+                    ? null
+                    : { kind: 'food', foodId },
+                )
+              }
+              onMoveSelection={(targetSpace) => {
+                if (targetSpace === 'leftHand' || targetSpace === 'rightHand') {
+                  setSelection(null);
+                  return;
+                }
+                if (selection?.kind === 'gob') {
+                  moveGob(targetSpace);
+                } else if (selection?.kind === 'food') {
+                  moveFood(selection.foodId, targetSpace);
+                }
+                setSelection(null);
+              }}
               onAddFood={() => setFoodModalOpen(true)}
               onPrepareFood={prepareFood}
             />

@@ -4,7 +4,7 @@ import type { Ingredient as FoodModel } from '~/types/game';
 interface FoodProps {
   food: FoodModel;
   selected?: boolean;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDoubleClick?: () => void;
   ref?: React.Ref<HTMLButtonElement>;
   style?: React.CSSProperties;
