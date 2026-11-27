@@ -4,7 +4,8 @@ import type { Ingredient as FoodModel } from '~/types/game';
 interface FoodProps {
   food: FoodModel;
   selected?: boolean;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onDoubleClick?: () => void;
   ref?: React.Ref<HTMLButtonElement>;
   style?: React.CSSProperties;
   className?: string;
@@ -16,6 +17,7 @@ export default function Food({
   food,
   selected = false,
   onClick,
+  onDoubleClick,
   ref,
   style,
   className,
@@ -33,6 +35,7 @@ export default function Food({
       ref={draggable ? draggableRef : ref}
       type='button'
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
       style={{ touchAction: draggable ? 'none' : undefined, ...style }}
       className={[
         'relative flex shrink-0 cursor-pointer flex-col overflow-hidden rounded-sm',
@@ -52,10 +55,9 @@ export default function Food({
       <img
         src={food.image}
         alt={food.name}
-        className='w-full h-full object-cover pointer-events-none'
+        className='h-full w-full object-cover pointer-events-none'
         draggable={false}
       />
     </button>
   );
 }
-

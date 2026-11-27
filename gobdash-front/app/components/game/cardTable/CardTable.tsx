@@ -16,6 +16,11 @@ interface CardTableProps {
   onBuyCard: (card: CardModel) => void;
   placedTokens: Record<number, CodeTokenType>;
   onClearToken: (cardId: number) => void;
+  selectedCardId?: number;
+  onSelectCardDestination?: (slotId: string) => void;
+  selectedToken?: CodeTokenType;
+  onSelectToken?: (token: CodeTokenType) => void;
+  onMoveToken?: (targetId: string) => void;
 }
 
 export default function CardTable({
@@ -28,6 +33,11 @@ export default function CardTable({
   onBuyCard,
   placedTokens,
   onClearToken,
+  selectedCardId,
+  onSelectCardDestination,
+  selectedToken,
+  onSelectToken,
+  onMoveToken,
 }: CardTableProps) {
   const isBuyPhase = turnPhase === 'buy';
   const hasPlayedThisTurn = Object.keys(playedCards).length > 0;
@@ -41,6 +51,11 @@ export default function CardTable({
       disabled: isBuyPhase || (hasPlayedThisTurn && !playedCard),
       onClear: () => onClearSlot(slotId),
       isExpandable: !playedCard,
+      canReceiveSelection:
+        !isBuyPhase &&
+        selectedCardId !== undefined &&
+        !(hasPlayedThisTurn && !playedCard),
+      onSelectDestination: () => onSelectCardDestination?.(slotId),
     };
   }
 
@@ -64,6 +79,9 @@ export default function CardTable({
                   id={makeCardTokenId(card.id)}
                   token={placedTokens[card.id] ?? null}
                   onClear={() => onClearToken(card.id)}
+                  selectedToken={selectedToken}
+                  onSelectToken={onSelectToken}
+                  onMoveToken={onMoveToken}
                 />
                 {isBuyPhase ? (
                   <button

@@ -12,6 +12,8 @@ interface DiscardPileProps {
   disabled?: boolean;
   /** Called when the player clicks X to return the staged card to hand. */
   onClearStaged?: () => void;
+  canReceiveCardSelection?: boolean;
+  onSelectDestination?: () => void;
 }
 
 export default function DiscardPile({
@@ -19,6 +21,8 @@ export default function DiscardPile({
   stagedCard,
   disabled = false,
   onClearStaged,
+  canReceiveCardSelection = false,
+  onSelectDestination,
 }: DiscardPileProps) {
   const { ref, isDropTarget } = useDroppable({ id: DISCARD_SLOT_ID, disabled });
 
@@ -32,6 +36,18 @@ export default function DiscardPile({
 
       <div
         ref={ref}
+        role={canReceiveCardSelection ? 'button' : 'group'}
+        tabIndex={canReceiveCardSelection ? 0 : undefined}
+        aria-label={canReceiveCardSelection ? 'Move selected card to discard' : 'Discard pile'}
+        onClick={() => {
+          if (canReceiveCardSelection) onSelectDestination?.();
+        }}
+        onKeyDown={(event) => {
+          if (canReceiveCardSelection && (event.key === 'Enter' || event.key === ' ')) {
+            event.preventDefault();
+            onSelectDestination?.();
+          }
+        }}
         className={[
           'relative flex w-27 min-h-39 items-center justify-center rounded-xl',
           'border-2 border-dashed transition-all duration-150',
@@ -49,7 +65,10 @@ export default function DiscardPile({
             {onClearStaged && (
               <button
                 type='button'
-                onClick={onClearStaged}
+                onClick={(event) => {
+                event.stopPropagation();
+                onClearStaged();
+              }}
                 aria-label='Return staged card to hand'
                 className='absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow hover:bg-red-600'>
                 X

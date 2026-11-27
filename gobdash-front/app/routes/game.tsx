@@ -82,7 +82,7 @@ export default function Game() {
         </div>
 
         {/* Board */}
-        <div className='h-full rounded-2xl overflow-hidden border border-stone-800/80 shadow-2xl'>
+        <div className='aspect-[1203/1600] w-full overflow-hidden rounded-2xl border border-stone-800/80 shadow-2xl'>
           <Board />
         </div>
       </div>

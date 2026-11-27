@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
 import type { Card as CardModel } from '~/types/game';
 import {
@@ -39,17 +40,23 @@ function CardHand() {
   } = useGameState();
 
   const hasStaged = Object.keys(playedCards).length > 0;
+  const [selectedCard, setSelectedCard] = useState<CardModel | null>(null);
+  const [selectedToken, setSelectedToken] = useState<CodeTokenType | null>(null);
 
   return (
     <>
       <DragDropProvider
         onDragStart={(event) => {
+          setSelectedCard(null);
+          setSelectedToken(null);
           const card = event.operation.source?.data?.card as
             CardModel | undefined;
           setDraggingCard(card ?? null);
         }}
         onDragEnd={(event) => {
           setDraggingCard(null);
+          setSelectedCard(null);
+          setSelectedToken(null);
           if (event.canceled) return;
 
           const token = event.operation.source?.data?.type as
@@ -77,6 +84,13 @@ function CardHand() {
 
           handleDrop(targetId, card);
         }}>
+        <p className='sr-only' aria-live='polite'>
+          {selectedCard
+            ? `Card ${selectedCard.type} selected. Choose a destination.`
+            : selectedToken
+              ? `${selectedToken} token selected. Choose a card slot.`
+              : 'No draggable object selected.'}
+        </p>
         {/* Card Deck + Discard Pile */}
         <div className='flex justify-center items-top gap-4 mb-4'>
           <CardDeck
@@ -98,6 +112,13 @@ function CardHand() {
                 ? undefined
                 : () => handleClearSlot(DISCARD_SLOT_ID)
             }
+            canReceiveCardSelection={turnPhase === 'use' && selectedCard !== null}
+            onSelectDestination={() => {
+              if (selectedCard) {
+                handleDrop(DISCARD_SLOT_ID, selectedCard);
+                setSelectedCard(null);
+              }
+            }}
           />
         </div>
 
@@ -113,6 +134,25 @@ function CardHand() {
             onBuyCard={handleSelectBuyFromTable}
             placedTokens={placedTokens}
             onClearToken={handleClearToken}
+            selectedCardId={selectedCard?.id}
+            onSelectCardDestination={(slotId) => {
+              if (selectedCard) {
+                handleDrop(slotId, selectedCard);
+                setSelectedCard(null);
+              }
+            }}
+            selectedToken={selectedToken ?? undefined}
+            onSelectToken={(token) =>
+              setSelectedToken((current) =>
+                current === token ? null : token,
+              )
+            }
+            onMoveToken={(targetId) => {
+              if (selectedToken) {
+                handleTokenDrop(targetId, selectedToken);
+                setSelectedToken(null);
+              }
+            }}
           />
         </div>
 
@@ -128,12 +168,28 @@ function CardHand() {
                 program: Object.values(placedTokens).includes('program'),
                 error: Object.values(placedTokens).includes('error'),
               }}
+              selectedToken={selectedToken ?? undefined}
+              onSelectToken={(token) =>
+                setSelectedToken((current) =>
+                  current === token ? null : token,
+                )
+              }
             />
           </div>
 
           {/* Player Hand */}
           <div className='shrink-0'>
-            <PlayerHand hand={hand} turnPhase={turnPhase} />
+            <PlayerHand
+              hand={hand}
+              turnPhase={turnPhase}
+              selectedCardId={selectedCard?.id}
+              onSelectCard={(card) => {
+                setSelectedToken(null);
+                setSelectedCard((current) =>
+                  current?.id === card.id ? null : card,
+                );
+              }}
+            />
           </div>
         </div>
 

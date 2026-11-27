@@ -5,12 +5,16 @@ interface PlayerHandProps {
   hand: CardModel[] | null;
   turnPhase: 'use' | 'buy';
   className?: string;
+  selectedCardId?: number;
+  onSelectCard?: (card: CardModel) => void;
 }
 
 export default function PlayerHand({
   hand,
   turnPhase,
   className = '',
+  selectedCardId,
+  onSelectCard,
 }: PlayerHandProps) {
   const isBuyPhase = turnPhase === 'buy';
 
@@ -33,7 +37,12 @@ export default function PlayerHand({
                   transformOrigin: 'bottom center',
                 }}
                 className='shrink-0'>
-                <DraggableCard card={card} disabled={isBuyPhase} />
+                <DraggableCard
+                  card={card}
+                  disabled={isBuyPhase}
+                  selected={selectedCardId === card.id}
+                  onSelect={() => onSelectCard?.(card)}
+                />
               </div>
             );
           })}
