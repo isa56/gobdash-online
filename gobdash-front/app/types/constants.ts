@@ -232,10 +232,9 @@ function getPreparedIngredient(food: Ingredient): Ingredient | null {
   );
 }
 
-export {
-  ingredients,
-  recipes,
-  deckOfCards,
-  createDeck,
-  getPreparedIngredient,
-};
+function generateRandomRecipe(): Recipe {
+  const randomIndex = Math.floor(Math.random() * recipes.length);
+  return recipes[randomIndex];
+}
+
+export { ingredients, recipes, deckOfCards, createDeck, getPreparedIngredient, generateRandomRecipe };

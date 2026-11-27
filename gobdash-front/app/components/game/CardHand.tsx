@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
-import type { Card as CardModel } from '~/types/game';
+import { Recipe, type Card as CardModel } from '~/types/game';
 import {
   ACTION_SLOT_PREFIX,
   DISCARD_SLOT_ID,
@@ -10,6 +10,7 @@ import PlayerHand from '~/components/game/cardTable/PlayerHand';
 import CardTable from '~/components/game/cardTable/CardTable';
 import CardDeck from '~/components/game/cardTable/CardDeck';
 import DiscardPile from '~/components/game/cardTable/DiscardPile';
+import RecipeCard from '~/components/game/cardTable/RecipeCard';
 import PhaseButton from '~/components/game/cardTable/PhaseButton';
 import CodeTokenContainer from '~/components/game/cardTable/CodeTokenContainer';
 import Card from '~/components/game/cardTable/Card';
@@ -39,6 +40,7 @@ function CardHand() {
     handleConfirmBuy,
     handleTokenDrop,
     handleClearToken,
+    recipe,
   } = useGameState();
 
   const hasStaged = Object.keys(playedCards).length > 0;
@@ -100,8 +102,13 @@ function CardHand() {
                 })
               : t('noDraggableSelected')}
         </p>
-        {/* Card Deck + Discard Pile */}
+        {/* Recipe Card + Card Deck + Discard Pile */}
         <div className='flex justify-center items-top gap-4 mb-4'>
+
+        <div className='mr-4'>
+          <RecipeCard recipe={recipe} />
+        </div>
+
           <CardDeck
             deckCount={deckCount}
             turnPhase={turnPhase}

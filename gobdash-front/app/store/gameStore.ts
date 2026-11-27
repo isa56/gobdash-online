@@ -1,8 +1,18 @@
 import { create } from 'zustand';
-import type { BoardSpace, Card, DeckOfCards, PantryFood } from '~/types/game';
+import type {
+  BoardSpace,
+  Card,
+  DeckOfCards,
+  PantryFood,
+  Recipe,
+} from '~/types/game';
 import { socketService } from '~/services/socketService';
 import type { ConnectionStatus, ServerGameStatePayload } from '~/types/server';
-import { createDeck, getPreparedIngredient } from '~/types/constants';
+import {
+  createDeck,
+  generateRandomRecipe,
+  getPreparedIngredient,
+} from '~/types/constants';
 import {
   ACTION_SLOT_PREFIX,
   CARD_TOKEN_PREFIX,
@@ -37,7 +47,7 @@ interface GameStore {
   gobSpace: BoardSpace;
   foodPositions: Record<number, BoardSpace>;
   foodTokens: PantryFood[];
-
+  recipe: Recipe | null;
   // ── Turn flow ────────────────────────────────────────────────────────────────
   turnPhase: TurnPhase;
   turnNumber: number;
@@ -108,6 +118,7 @@ const initialGameState = {
   turnNumber: 1,
   numberOfPlayers: 4,
   mounted: false,
+  recipe: null,
 };
 
 export const useGameStore = create<GameStore>()((set, get) => ({
@@ -119,12 +130,14 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     // Guard prevents double-deal in React StrictMode (effects run twice in dev).
     if (get().mounted) return;
     const deck = createDeck();
+    const recipe = generateRandomRecipe();
     set({
       localDeck: deck,
       hand: deck.dealCards(5),
       cardTableCards: deck.dealCards(5),
       deckCount: deck.cards.length,
       mounted: true,
+      recipe: recipe,
     });
   },
 
@@ -188,11 +201,19 @@ export const useGameStore = create<GameStore>()((set, get) => ({
         turnPhase: 'buy',
       }));
     } else {
-      const slotIndex = parseInt(slotId.replace(`${ACTION_SLOT_PREFIX}-`, ''), 10);
+      const slotIndex = parseInt(
+        slotId.replace(`${ACTION_SLOT_PREFIX}-`, ''),
+        10,
+      );
       set((state) => {
         const next = [...state.cardTableCards];
         next.splice(slotIndex, 0, card);
-        return { cardTableCards: next, playedCards: {}, cardModes: {}, turnPhase: 'buy' };
+        return {
+          cardTableCards: next,
+          playedCards: {},
+          cardModes: {},
+          turnPhase: 'buy',
+        };
       });
     }
   },
@@ -210,7 +231,10 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     const topCard = get().localDeck?.cards[0];
     if (!topCard) return; // deck empty
     set((state) => ({
-      bought: state.bought?.source === 'deck' ? null : { card: topCard, source: 'deck' },
+      bought:
+        state.bought?.source === 'deck'
+          ? null
+          : { card: topCard, source: 'deck' },
     }));
   },
 
@@ -231,7 +255,9 @@ export const useGameStore = create<GameStore>()((set, get) => ({
       }));
     } else {
       set((state) => ({
-        cardTableCards: state.cardTableCards.filter((c) => c.id !== bought.card.id),
+        cardTableCards: state.cardTableCards.filter(
+          (c) => c.id !== bought.card.id,
+        ),
         hand: [...state.hand, bought.card],
         bought: null,
         turnPhase: 'use',
@@ -242,14 +268,14 @@ export const useGameStore = create<GameStore>()((set, get) => ({
 
   handleTokenDrop: (targetId, token) => {
     if (!targetId.startsWith(CARD_TOKEN_PREFIX)) return;
-    const cardId = Number(
-      targetId.slice(`${CARD_TOKEN_PREFIX}-`.length),
-    );
+    const cardId = Number(targetId.slice(`${CARD_TOKEN_PREFIX}-`.length));
     if (!Number.isInteger(cardId)) return;
 
     set((state) => {
       const next = Object.fromEntries(
-        Object.entries(state.placedTokens).filter(([, value]) => value !== token),
+        Object.entries(state.placedTokens).filter(
+          ([, value]) => value !== token,
+        ),
       ) as Record<number, CodeTokenType>;
       next[cardId] = token;
       return { placedTokens: next };
