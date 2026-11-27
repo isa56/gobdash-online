@@ -26,8 +26,8 @@ const boardSpacePositions: Record<BoardSpaceName, { left: string; top: string }>
   countertop: { left: '82%', top: '60%' },
   salon: { left: '50%', top: '65%' },
   delivery: { left: '50%', top: '88%' },
-  leftHand: { left: '15%', top: '8%' },
-  rightHand: { left: '85%', top: '8%' },
+  leftHand: { left: '15%', top: '10%' },
+  rightHand: { left: '85%', top: '10%' },
 };
 
 type BoardSelection =
@@ -88,7 +88,7 @@ function BoardDropZone({
         }
       }}
       className={[
-        'absolute z-10 flex h-[14%] w-[14%] -translate-x-1/2 -translate-y-1/2',
+        'absolute z-10 flex aspect-square w-[20%] -translate-x-1/2 -translate-y-1/2',
         'items-center justify-center rounded-full border-3 border-dashed shadow-lg transition-all',
         isHand
           ? 'border-stone-500/60 bg-stone-950/40'
@@ -116,7 +116,7 @@ function BoardDropZone({
             onSelectFood(token.id);
           }}
           onDoubleClick={() => onPrepareFood(token.id)}
-          className='absolute h-[82%] w-[82%] rounded-full border border-amber-100/70'
+          className='absolute h-[82%] w-[82%] border border-amber-100/70'
         />
       ))}
       {id === 'pantry' ? (
@@ -185,7 +185,7 @@ function Board() {
           }
         }}>
         <div
-          className='relative h-full w-full overflow-hidden bg-cover bg-center'
+          className='relative h-full w-full overflow-hidden bg-contain bg-center bg-no-repeat'
           style={{
             backgroundImage: `url("${publicAssetPath('images/board/board.webp')}")`,
           }}>

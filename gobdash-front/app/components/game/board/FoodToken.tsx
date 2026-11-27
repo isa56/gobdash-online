@@ -55,10 +55,9 @@ export default function Food({
       <img
         src={food.image}
         alt={food.name}
-        className='w-full h-full object-cover pointer-events-none'
+        className='h-full w-full object-cover pointer-events-none'
         draggable={false}
       />
     </button>
   );
 }
-
