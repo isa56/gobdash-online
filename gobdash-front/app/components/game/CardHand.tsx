@@ -168,7 +168,7 @@ function CardHand() {
         {/* Player Controls: Code Tokens Tray & Player Hand */}
         <div className='flex items-center justify-center gap-x-6 lg:gap-x-8 w-full mt-6 mb-4 px-2'>
           {/* Code Token Tray */}
-          <div className='flex flex-col items-center justify-center p-3 rounded-2xl bg-stone-900/60 border border-stone-800/80 shadow-md backdrop-blur-xs shrink-0 min-w-[140px]'>
+          <div className='flex flex-col items-center justify-center p-3 mr-2 rounded-2xl bg-stone-900/60 border border-stone-800/80 shadow-md backdrop-blur-xs shrink-0 min-w-[140px]'>
             <p className='text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2'>
               {t('tokens')}
             </p>

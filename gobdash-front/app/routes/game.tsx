@@ -35,15 +35,11 @@ export default function Game() {
     setErrorMessage,
     mounted,
     initLocalGame,
-    resetGame,
   } = useGameState();
 
   useEffect(() => {
     initLocalGame();
-    return () => {
-      resetGame();
-    };
-  }, [initLocalGame, resetGame, roomId]);
+  }, [initLocalGame]);
 
   useEffect(() => {
     document.title = t('playingGobDash');

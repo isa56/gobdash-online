@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useGameStore } from '~/store/gameStore';
 import { socketService } from '~/services/socketService';
 import { roomService } from '~/services/roomService';
@@ -10,7 +10,7 @@ import { appConfig } from '~/config';
  *
  * - Connects on mount / reconnects when `roomId` changes.
  * - Dispatches `applyServerState` into the store on server events.
- * - Disconnects and resets status on unmount.
+ * - Disconnects and leaves the room on unmount.
  *
  * In mock mode (default), the socket is a no-op and status jumps straight
  * to `'connected'` so the game is immediately playable offline.
@@ -21,11 +21,18 @@ export function useRoom(roomId: string): { connectionStatus: ConnectionStatus } 
   const setNumberOfPlayers = useGameStore((s) => s.setNumberOfPlayers);
   const setErrorMessage = useGameStore((s) => s.setErrorMessage);
   const applyServerState = useGameStore((s) => s.applyServerState);
-  const resetGame = useGameStore((s) => s.resetGame);
   const playerId = useGameStore((s) => s.playerId) ?? 'local-player';
   const connectionStatus = useGameStore((s) => s.connectionStatus);
+  const pendingLeaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   useEffect(() => {
+    if (pendingLeaveTimeout.current !== null) {
+      clearTimeout(pendingLeaveTimeout.current);
+      pendingLeaveTimeout.current = null;
+    }
+
     setRoomId(roomId);
     setConnectionStatus('connecting');
 
@@ -74,15 +81,17 @@ export function useRoom(roomId: string): { connectionStatus: ConnectionStatus } 
       socketService.off('PLAYER_LEFT', handlePlayerLeft);
       socketService.offConnectionStatus(handleConnectionStatus);
       socketService.disconnect();
-      roomService.leaveRoom(roomId, playerId).catch((error: unknown) => {
-        console.error('[useRoom] Failed to leave room:', error);
-      });
-      resetGame();
+      // Avoid leaving the room during StrictMode's immediate effect replay.
+      pendingLeaveTimeout.current = setTimeout(() => {
+        pendingLeaveTimeout.current = null;
+        roomService.leaveRoom(roomId, playerId).catch((error: unknown) => {
+          console.error('[useRoom] Failed to leave room:', error);
+        });
+      }, 0);
     };
   }, [
     roomId,
     playerId,
-    resetGame,
     setConnectionStatus,
     setErrorMessage,
     setNumberOfPlayers,

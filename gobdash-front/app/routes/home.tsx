@@ -21,6 +21,7 @@ export default function Home() {
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const resetGame = useGameStore((state) => state.resetGame);
   const setPlayerId = useGameStore((state) => state.setPlayerId);
 
   async function handleCreateGame() {
@@ -28,6 +29,7 @@ export default function Home() {
       setIsCreating(true);
       setErrorMessage(null);
       const { roomId, playerId } = await roomService.createRoom();
+      resetGame();
       setPlayerId(playerId);
       navigate(`/game/${roomId}`);
     } catch (error: unknown) {
@@ -45,6 +47,7 @@ export default function Home() {
       setErrorMessage(null);
       const roomId = joinCode.trim();
       const { playerId } = await roomService.joinRoom(roomId);
+      resetGame();
       setPlayerId(playerId);
       navigate(`/game/${roomId}`);
     } catch (error: unknown) {
