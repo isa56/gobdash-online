@@ -10,6 +10,7 @@
 import type { Route } from './+types/root';
 import './app.css';
 import Footer from './components/Footer';
+import { LanguageProvider } from './lib/i18n';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -34,13 +35,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className='w-full h-full'>
-        <main className='flex-1 flex justify-center items-center w-full h-full'>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-
-        </main>
-        <Footer />
+        <LanguageProvider>
+          <main className='flex-1 flex justify-center items-center w-full h-full'>
+            {children}
+            <ScrollRestoration />
+            <Scripts />
+          </main>
+          <Footer />
+        </LanguageProvider>
       </body>
     </html>
   );
@@ -78,4 +80,3 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     </main>
   );
 }
-

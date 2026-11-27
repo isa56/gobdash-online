@@ -1,4 +1,6 @@
 import type { Card as CardModel, CardMode } from '~/types/game';
+import { getCardLabel, useLanguage } from '~/lib/i18n';
+import { getActionCardImage } from '~/lib/cardAssets';
 
 interface CardProps {
   card: CardModel;
@@ -20,7 +22,9 @@ export default function Card({
   style,
   className,
 }: CardProps) {
+  const { language, t } = useLanguage();
   const resolvedMode = mode ?? card.mode;
+  const cardName = getCardLabel(card.type, t);
   return (
     <button
       ref={ref}
@@ -40,14 +44,13 @@ export default function Card({
         className ?? '',
       ].join(' ')}
       aria-pressed={selected}
-      aria-label={card.type}>
+      aria-label={cardName}>
       <img
-        src={card.image}
-        alt={card.type}
+        src={getActionCardImage(card.type, language)}
+        alt={cardName}
         className='w-full h-full object-cover pointer-events-none'
         draggable={false}
       />
     </button>
   );
 }
-

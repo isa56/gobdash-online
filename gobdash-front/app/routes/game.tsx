@@ -8,6 +8,7 @@ import { useRoom } from '~/hooks/useRoom';
 import Board from '~/components/game/Board';
 import CardHand from '~/components/game/CardHand';
 import ToastComponent from '~/components/ui/ToastComponent';
+import { useLanguage } from '~/lib/i18n';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -17,6 +18,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Game() {
+  const { language, t } = useLanguage();
   const params = useParams();
   const roomId = params.roomId || '123456';
 
@@ -33,15 +35,15 @@ export default function Game() {
     setErrorMessage,
     mounted,
     initLocalGame,
-    resetGame,
   } = useGameState();
 
   useEffect(() => {
     initLocalGame();
-    return () => {
-      resetGame();
-    };
-  }, [initLocalGame, resetGame, roomId]);
+  }, [initLocalGame]);
+
+  useEffect(() => {
+    document.title = t('playingGobDash');
+  }, [language, t]);
 
   if (!mounted) {
     return <LoadingSpinner />;
@@ -54,7 +56,7 @@ export default function Game() {
           text={
             errorMessage ??
             (connectionStatus === 'error'
-              ? 'Connection to the game server failed.'
+              ? t('connectionFailed')
               : '')
           }
           type='error'

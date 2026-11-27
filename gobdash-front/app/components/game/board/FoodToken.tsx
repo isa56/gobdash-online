@@ -1,5 +1,6 @@
 import { useDraggable } from '@dnd-kit/react';
 import type { Ingredient as FoodModel } from '~/types/game';
+import { getIngredientLabel, useLanguage } from '~/lib/i18n';
 
 interface FoodProps {
   food: FoodModel;
@@ -24,6 +25,8 @@ export default function Food({
   draggable = false,
   dragId,
 }: FoodProps) {
+  const { t } = useLanguage();
+  const foodLabel = getIngredientLabel(food.name, t);
   const { ref: draggableRef, isDragging } = useDraggable({
     id: dragId ?? `food-preview-${food.name}`,
     type: 'food',
@@ -51,10 +54,10 @@ export default function Food({
         className ?? '',
       ].join(' ')}
       aria-pressed={selected}
-      aria-label={food.name}>
+      aria-label={foodLabel}>
       <img
         src={food.image}
-        alt={food.name}
+        alt={foodLabel}
         className='h-full w-full object-cover pointer-events-none'
         draggable={false}
       />

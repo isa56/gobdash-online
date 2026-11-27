@@ -1,5 +1,6 @@
 import DraggableCard from './DraggableCard';
 import type { Card as CardModel } from '~/types/game';
+import { useLanguage } from '~/lib/i18n';
 
 interface PlayerHandProps {
   hand: CardModel[] | null;
@@ -16,6 +17,7 @@ export default function PlayerHand({
   selectedCardId,
   onSelectCard,
 }: PlayerHandProps) {
+  const { t } = useLanguage();
   const isBuyPhase = turnPhase === 'buy';
 
   return (
@@ -23,7 +25,7 @@ export default function PlayerHand({
       <div className={`flex flex-col items-center w-fit ${className}`}>
         {/* Fan of cards */}
         <p className='text-sm font-semibold uppercase tracking-widest text-stone-400'>
-          Hand
+          {t('hand')}
         </p>
         <div className='flex items-center justify-center w-full gap-2 sm:gap-3 lg:gap-4'>
           {hand?.map((card, index) => {
@@ -51,4 +53,3 @@ export default function PlayerHand({
     </>
   );
 }
-
