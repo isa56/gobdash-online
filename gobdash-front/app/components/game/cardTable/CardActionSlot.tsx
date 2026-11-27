@@ -50,11 +50,11 @@ function DroppableSlot({
         }
       }}
       className={[
-        'group flex h-45 items-center justify-center rounded-xl shrink-0',
+        'group flex h-51 items-center justify-center rounded-xl shrink-0',
         'border-2 border-dashed transition-all duration-200 ease-in-out',
         isCollapsible
           ? isDropTarget
-            ? 'w-32 scale-105 border-amber-400 bg-amber-50/20 shadow-lg shadow-amber-400/30'
+            ? 'w-34 scale-105 border-amber-400 bg-amber-50/20 shadow-lg shadow-amber-400/30'
             : [
                 'w-8',
                 !disabled &&

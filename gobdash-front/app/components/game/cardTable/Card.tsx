@@ -28,7 +28,7 @@ export default function Card({
       onClick={onClick}
       style={style}
       className={[
-        'relative flex shrink-0 aspect-[5/7] cursor-pointer flex-col overflow-hidden rounded-sm',
+        'relative flex shrink-0 aspect-41/63 cursor-pointer flex-col overflow-hidden rounded-sm',
         'shadow-md outline-2 outline-transparent',
         'transition-all duration-150 ease-out',
         'hover:-translate-y-1 hover:shadow-xl',
