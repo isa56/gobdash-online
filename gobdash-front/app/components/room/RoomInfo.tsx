@@ -2,6 +2,8 @@ import { useState } from 'react';
 import ToastComponent from '~/components/ui/ToastComponent';
 import { BsArrowLeft, BsFillPersonFill } from 'react-icons/bs';
 import { NavLink } from 'react-router';
+import LanguageSelector from '~/components/ui/LanguageSelector';
+import { useLanguage } from '~/lib/i18n';
 
 interface RoomInfoProps {
   roomId: string | number;
@@ -16,6 +18,7 @@ export default function RoomInfo({
   turnNumber,
   turnPhase,
 }: RoomInfoProps) {
+  const { t } = useLanguage();
   const [showToast, setShowToast] = useState(false);
 
   function onCopy() {
@@ -34,6 +37,9 @@ export default function RoomInfo({
 
   return (
     <div className='flex items-center justify-between w-full h-full'>
+      <div className='ml-3'>
+        <LanguageSelector />
+      </div>
       <NavLink
         to='/'
         className='flex text-white ml-4 items-center justify-center gap-2 bg-espresso/75 p-4 rounded-4xl cursor-pointer hover:bg-espresso-dark'>
@@ -51,7 +57,7 @@ export default function RoomInfo({
                   ? 'text-amber-400 font-bold'
                   : 'text-stone-500'
               }>
-              1. Use a card
+              {t('useCard')}
             </span>
             <span className='text-stone-600'>→</span>
             <span
@@ -60,7 +66,7 @@ export default function RoomInfo({
                   ? 'text-amber-400 font-bold'
                   : 'text-stone-500'
               }>
-              2. Buy a card
+              {t('buyCard')}
             </span>
           </div>
         </div>
@@ -70,17 +76,17 @@ export default function RoomInfo({
         <h1
           className='text-2xl font-bold font-emphasis text-sand-dune cursor-pointer'
           onClick={onCopy}>
-          Room: <span className='text-fern-light'>{roomId}</span>
+          {t('room')}: <span className='text-fern-light'>{roomId}</span>
         </h1>
         <p className='text-sm text-white'>
-          Player {turnNumber % numberOfPlayers}'s turn
+          {t('playerTurn', { player: turnNumber % numberOfPlayers })}
         </p>
-        <p className='text-sm text-white'>Turn number: {turnNumber}</p>
+        <p className='text-sm text-white'>{t('turnNumber', { number: turnNumber })}</p>
       </div>
 
       <div className='fixed bottom-4 right-4 z-50'>
         <ToastComponent
-          text='Room number copied!'
+          text={t('roomCopied')}
           type='success'
           show={showToast}
           onClose={() => setShowToast(false)}
@@ -89,4 +95,3 @@ export default function RoomInfo({
     </div>
   );
 }
-

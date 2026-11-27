@@ -91,6 +91,20 @@ O fluxo de interação usa `@dnd-kit/react`:
 - tokens `program` e `error` podem ser colocados sobre cartas;
 - a fase de compra bloqueia o arraste e permite selecionar uma carta da mesa ou do topo do baralho.
 
+### Idiomas e imagens das cartas
+
+A interface oferece English e Português (Brasil). A escolha é individual por
+navegador, fica salva em `localStorage` e pode ser alterada na tela inicial ou
+durante a partida. Textos e nomes acessíveis usam o catálogo em
+`app/lib/i18n.tsx`; os identificadores internos de cartas, receitas e
+ingredientes continuam em inglês para preservar as regras e os dados enviados
+ao servidor.
+
+As imagens em `public/images/cards/pt-BR/` são cópias temporárias das cartas em
+inglês. Substitua esses arquivos pelos originais em português mantendo os mesmos
+nomes; as cartas de ação e receitas usam respectivamente as pastas
+`action_cards/` e `recipe_cards/`.
+
 As regras de destino e os identificadores dos slots ficam centralizados em `app/lib/slots.ts`, evitando que os componentes precisem conhecer convenções de string espalhadas pelo código.
 
 ## Principais bibliotecas

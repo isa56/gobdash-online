@@ -1,5 +1,6 @@
 import CodeToken from './CodeToken';
 import type { CodeTokenType } from './CodeToken';
+import { useLanguage } from '~/lib/i18n';
 
 interface CodeTokenContainerProps {
   placedTokens: Record<CodeTokenType, boolean>;
@@ -14,6 +15,7 @@ function CodeTokenContainer({
   selectedToken,
   onSelectToken,
 }: CodeTokenContainerProps) {
+  const { t } = useLanguage();
   const allPlaced = placedTokens.program && placedTokens.error;
 
   return (
@@ -39,7 +41,7 @@ function CodeTokenContainer({
 
       {allPlaced && (
         <span className='text-xs text-stone-500 italic px-2 text-center select-none'>
-          Tokens placed
+          {t('tokensPlaced')}
         </span>
       )}
     </div>

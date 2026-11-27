@@ -2,6 +2,7 @@ import { useDroppable } from '@dnd-kit/react';
 import Card from './Card';
 import type { Card as CardModel } from '~/types/game';
 import { DISCARD_SLOT_ID } from '~/lib/slots';
+import { useLanguage } from '~/lib/i18n';
 
 interface DiscardPileProps {
   /** Cards already confirmed into the discard pile. */
@@ -24,6 +25,7 @@ export default function DiscardPile({
   canReceiveCardSelection = false,
   onSelectDestination,
 }: DiscardPileProps) {
+  const { t } = useLanguage();
   const { ref, isDropTarget } = useDroppable({ id: DISCARD_SLOT_ID, disabled });
 
   const topCard = pile[pile.length - 1] ?? null;
@@ -31,14 +33,16 @@ export default function DiscardPile({
   return (
     <div className='flex flex-col items-center gap-2'>
       <p className='text-sm font-semibold uppercase tracking-widest text-stone-400'>
-        Discard
+        {t('discard')}
       </p>
 
       <div
         ref={ref}
         role={canReceiveCardSelection ? 'button' : 'group'}
         tabIndex={canReceiveCardSelection ? 0 : undefined}
-        aria-label={canReceiveCardSelection ? 'Move selected card to discard' : 'Discard pile'}
+        aria-label={
+          canReceiveCardSelection ? t('moveCardToDiscard') : t('discardPile')
+        }
         onClick={() => {
           if (canReceiveCardSelection) onSelectDestination?.();
         }}
@@ -69,13 +73,13 @@ export default function DiscardPile({
                 event.stopPropagation();
                 onClearStaged();
               }}
-                aria-label='Return staged card to hand'
+                aria-label={t('returnCardToHand')}
                 className='absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow hover:bg-red-600'>
                 X
               </button>
             )}
             <span className='absolute bottom-1 left-0 right-0 text-center text-xs text-red-300 font-semibold'>
-              Will discard
+              {t('willDiscard')}
             </span>
           </div>
         ) : topCard ? (
@@ -84,17 +88,18 @@ export default function DiscardPile({
           </div>
         ) : (
           <span className='select-none text-sm text-stone-400 text-center px-2'>
-            {isDropTarget ? 'Release to discard' : 'Drop to discard'}
+            {isDropTarget ? t('releaseToDiscard') : t('dropToDiscard')}
           </span>
         )}
       </div>
 
       {pile.length > 0 && (
         <span className='text-xs text-stone-400'>
-          {pile.length} card{pile.length !== 1 ? 's' : ''}
+          {pile.length === 1
+            ? t('oneCardCount')
+            : t('cardCount', { count: pile.length })}
         </span>
       )}
     </div>
   );
 }
-

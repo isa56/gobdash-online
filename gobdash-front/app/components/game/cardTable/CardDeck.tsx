@@ -1,3 +1,5 @@
+import { useLanguage } from '~/lib/i18n';
+
 interface CardDeckProps {
   deckCount: number;
   turnPhase: 'use' | 'buy';
@@ -11,20 +13,21 @@ export default function CardDeck({
   isSelected,
   onSelect,
 }: CardDeckProps) {
+  const { t } = useLanguage();
   const isEmpty = deckCount === 0;
   const disabled = turnPhase === 'use' || isEmpty;
 
   return (
     <div className='flex flex-col items-center gap-2'>
       <p className='text-sm font-semibold uppercase tracking-widest text-stone-400'>
-        Buy Deck
+        {t('buyDeck')}
       </p>
 
       <button
         type='button'
         onClick={disabled ? undefined : onSelect}
         disabled={disabled}
-        aria-label={`Buy deck, ${deckCount} cards remaining`}
+        aria-label={t('buyDeckAria', { count: deckCount })}
         className={[
           'relative flex w-26 min-h-38 items-center justify-center rounded-xl',
           'border-2 transition-all duration-150 select-none',
@@ -45,12 +48,12 @@ export default function CardDeck({
             isSelected ? 'bg-amber-900/30' : 'bg-stone-800',
           ].join(' ')}>
           {isEmpty ? (
-            <span className='text-stone-500 text-sm font-semibold'>Empty</span>
+            <span className='text-stone-500 text-sm font-semibold'>{t('empty')}</span>
           ) : (
             <>
               <span className='text-5xl font-bold text-stone-200'>{deckCount}</span>
               <span className='text-xs text-stone-400 uppercase tracking-wider'>
-                {isSelected ? 'Click again to cancel' : 'Click to select'}
+                {isSelected ? t('clickAgainToCancel') : t('clickToSelect')}
               </span>
             </>
           )}
@@ -59,10 +62,11 @@ export default function CardDeck({
 
       {deckCount > 0 && (
         <span className='text-xs text-stone-400'>
-          {deckCount} card{deckCount !== 1 ? 's' : ''} left
+          {deckCount === 1
+            ? t('oneCardLeft')
+            : t('cardsLeft', { count: deckCount })}
         </span>
       )}
     </div>
   );
 }
-

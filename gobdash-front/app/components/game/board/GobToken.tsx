@@ -1,5 +1,6 @@
 import { useDraggable } from '@dnd-kit/react';
 import { publicAssetPath } from '~/lib/assets';
+import { useLanguage } from '~/lib/i18n';
 
 interface GobProps {
   draggable?: boolean;
@@ -9,6 +10,7 @@ interface GobProps {
 }
 
 function GobToken({ draggable = true, className, onClick, selected = false }: GobProps) {
+  const { t } = useLanguage();
   const { ref, isDragging } = useDraggable({
     id: 'gob-token',
     type: 'gob',
@@ -32,12 +34,12 @@ function GobToken({ draggable = true, className, onClick, selected = false }: Go
         selected ? 'ring-4 ring-amber-400 ring-offset-2 scale-105' : '',
         className ?? '',
       ].join(' ')}
-      aria-label='Gob token'
+      aria-label={t('gobToken')}
       aria-pressed={selected}
       disabled={!draggable && !onClick}>
       <img
         src={publicAssetPath('images/game_tokens/gob_contorno_pequeno.webp')}
-        alt='Gob'
+        alt={t('gob')}
         className='pointer-events-none h-full w-full object-contain drop-shadow-xl'
         draggable={false}
       />

@@ -2,6 +2,7 @@ import { useDroppable } from '@dnd-kit/react';
 import Card from './Card';
 import type { Card as CardModel, CardMode } from '~/types/game';
 import { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID, makeSlotId } from '~/lib/slots';
+import { useLanguage } from '~/lib/i18n';
 
 export { ACTION_SLOT_PREFIX, DISCARD_SLOT_ID, makeSlotId };
 
@@ -27,6 +28,7 @@ function DroppableSlot({
   canReceiveSelection = false,
   onSelectDestination,
 }: CardActionSlotProps) {
+  const { t } = useLanguage();
   const { ref, isDropTarget } = useDroppable({
     id,
     disabled,
@@ -39,7 +41,11 @@ function DroppableSlot({
       ref={ref}
       role={canReceiveSelection ? 'button' : 'group'}
       tabIndex={canReceiveSelection ? 0 : undefined}
-      aria-label={canReceiveSelection ? `Move selected card to ${id}` : `${id} card slot`}
+      aria-label={
+        canReceiveSelection
+          ? t('moveSelectedCard')
+          : t('cardSlot')
+      }
       onClick={() => {
         if (canReceiveSelection) onSelectDestination?.();
       }}
@@ -84,7 +90,7 @@ function DroppableSlot({
                 event.stopPropagation();
                 onClear();
               }}
-              aria-label='Remove played card'
+              aria-label={t('removePlayedCard')}
               className='absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow hover:bg-red-600 cursor-pointer'>
               X
             </button>
@@ -104,7 +110,7 @@ function DroppableSlot({
           </span>
           {!disabled && (
             <span className='absolute select-none text-sm text-stone-300 whitespace-nowrap text-center opacity-0 group-hover:opacity-100 transition-opacity duration-200'>
-              Drop card here
+              {t('dropCardHere')}
             </span>
           )}
         </div>
@@ -114,7 +120,7 @@ function DroppableSlot({
             'select-none text-sm text-stone-400 whitespace-nowrap text-center transition-opacity duration-150',
             isDropTarget ? 'opacity-100!' : '',
           ].join(' ')}>
-          {isDropTarget ? 'Release to play' : 'Drop card here'}
+          {isDropTarget ? t('releaseToPlay') : t('dropCardHere')}
         </span>
       )}
     </div>
@@ -124,4 +130,3 @@ function DroppableSlot({
 export default function CardActionSlot(props: CardActionSlotProps) {
   return <DroppableSlot key={props.id} {...props} />;
 }
-

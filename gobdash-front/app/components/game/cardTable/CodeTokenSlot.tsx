@@ -1,6 +1,7 @@
 import { useDraggable, useDroppable } from '@dnd-kit/react';
 import { publicAssetPath } from '~/lib/assets';
 import type { CodeTokenType } from './CodeToken';
+import { useLanguage } from '~/lib/i18n';
 
 interface CodeTokenSlotProps {
   id: string;
@@ -26,6 +27,7 @@ export default function CodeTokenSlot({
   onSelectToken,
   onMoveToken,
 }: CodeTokenSlotProps) {
+  const { t } = useLanguage();
   const { ref: dropRef, isDropTarget } = useDroppable({
     id,
     disabled,
@@ -43,7 +45,7 @@ export default function CodeTokenSlot({
       ref={dropRef}
       role={selectedToken ? 'button' : 'group'}
       tabIndex={selectedToken ? 0 : undefined}
-      aria-label={selectedToken ? `Place selected token in ${id}` : `${id} code token slot`}
+      aria-label={selectedToken ? t('moveSelectedToken') : t('codeTokenSlot')}
       onClick={() => {
         if (selectedToken && onMoveToken) onMoveToken(id);
       }}
@@ -73,14 +75,16 @@ export default function CodeTokenSlot({
               event.stopPropagation();
               onSelectToken?.(token);
             }}
-            aria-label={`Select ${token} code token`}
+            aria-label={t('selectToken', {
+              token: token === 'program' ? t('codeToken') : t('errorToken'),
+            })}
             aria-pressed={selectedToken === token}
             className={selectedToken === token
               ? 'rounded-full ring-4 ring-amber-400 scale-105'
               : 'rounded-full'}>
             <img
               src={tokenImages[token]}
-              alt={`${token} code token`}
+              alt={token === 'program' ? t('codeToken') : t('errorToken')}
               className={[
                 'h-32 object-contain cursor-grab active:cursor-grabbing transition-opacity duration-100',
                 isDragging ? 'opacity-30' : 'opacity-100',
@@ -95,7 +99,7 @@ export default function CodeTokenSlot({
                 event.stopPropagation();
                 onClear();
               }}
-              aria-label='Remove code token'
+              aria-label={t('removeCodeToken')}
               className='absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow hover:bg-red-600 cursor-pointer'>
               X
             </button>

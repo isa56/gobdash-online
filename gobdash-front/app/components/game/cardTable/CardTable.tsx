@@ -4,6 +4,7 @@ import Card from './Card';
 import CodeTokenSlot from './CodeTokenSlot';
 import type { CodeTokenType } from './CodeToken';
 import { makeCardTokenId } from '~/lib/slots';
+import { getCardLabel, useLanguage } from '~/lib/i18n';
 
 interface CardTableProps {
   cards: CardModel[] | null;
@@ -39,6 +40,7 @@ export default function CardTable({
   onSelectToken,
   onMoveToken,
 }: CardTableProps) {
+  const { t } = useLanguage();
   const isBuyPhase = turnPhase === 'buy';
   const hasPlayedThisTurn = Object.keys(playedCards).length > 0;
 
@@ -87,7 +89,9 @@ export default function CardTable({
                   <button
                     type='button'
                     onClick={() => onBuyCard(card)}
-                    aria-label={`Buy ${card.type}`}
+                    aria-label={t('buyCardAria', {
+                      card: getCardLabel(card.type, t),
+                    })}
                     className={[
                       'rounded-xl transition-all duration-150 cursor-pointer',
                       isSelected
@@ -109,4 +113,3 @@ export default function CardTable({
     </div>
   );
 }
-

@@ -1,4 +1,7 @@
+import { useLanguage } from '~/lib/i18n';
+
 export default function LoadingSpinner() {
+  const { t } = useLanguage();
   return (
     <div role='status'>
       <svg
@@ -16,8 +19,7 @@ export default function LoadingSpinner() {
           fill='orange'
         />
       </svg>
-      <span className='sr-only'>Loading...</span>
+      <span className='sr-only'>{t('loading')}</span>
     </div>
   );
 }
-

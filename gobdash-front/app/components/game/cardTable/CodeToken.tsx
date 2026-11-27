@@ -1,5 +1,6 @@
 import { useDraggable } from '@dnd-kit/react';
 import { publicAssetPath } from '~/lib/assets';
+import { useLanguage } from '~/lib/i18n';
 
 export type CodeTokenType = 'program' | 'error';
 
@@ -11,11 +12,12 @@ interface CodeTokenProps {
 }
 
 function CodeToken({ type, id, selected = false, onSelect }: CodeTokenProps) {
+  const { t } = useLanguage();
   const tokenImage =
     type === 'program'
       ? publicAssetPath('images/game_tokens/code_token.webp')
       : publicAssetPath('images/game_tokens/error_token.webp');
-  const tokenAlt = type === 'program' ? 'Code Token' : 'Error Token';
+  const tokenAlt = type === 'program' ? t('codeToken') : t('errorToken');
 
   const { ref, isDragging } = useDraggable({
     id: id,
@@ -28,7 +30,7 @@ function CodeToken({ type, id, selected = false, onSelect }: CodeTokenProps) {
       type='button'
       ref={ref}
       onClick={onSelect}
-      aria-label={`Select ${tokenAlt}`}
+      aria-label={t('selectToken', { token: tokenAlt })}
       aria-pressed={selected}
       className={[
         'shrink-0 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-300',

@@ -1,3 +1,5 @@
+import { useLanguage } from '~/lib/i18n';
+
 type FloatingButtonProps = {
   icon?: React.ReactNode;
   label?: string;
@@ -17,6 +19,7 @@ function FloatingButton({
   ariaLabel,
   position = 'bottom-right',
 }: FloatingButtonProps) {
+  const { t } = useLanguage();
   const positionClasses = {
     'bottom-right': 'bottom-6 right-6',
     'bottom-left': 'bottom-6 left-6',
@@ -29,7 +32,7 @@ function FloatingButton({
       type='button'
       onClick={onClick}
       disabled={disabled}
-      aria-label={ariaLabel || label || 'Floating action button'}
+      aria-label={ariaLabel || label || t('floatingActionButton')}
       className={[
         'fixed z-50 flex items-center justify-center gap-2 rounded-full border border-fern-light bg-fern px-4 py-3 text-white shadow-lg shadow-espresso/30 transition-all duration-200 hover:scale-[1.02] hover:bg-fern-dark focus:outline-none focus:ring-2 focus:ring-sunlit-clay focus:ring-offset-2 focus:ring-offset-espresso disabled:cursor-not-allowed disabled:opacity-50',
         positionClasses[position],

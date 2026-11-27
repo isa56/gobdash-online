@@ -1,5 +1,6 @@
 import type { BoughtSelection, TurnPhase } from '~/store/gameStore';
 import FloatingButton from '~/components/ui/FloatingButton';
+import { useLanguage } from '~/lib/i18n';
 
 interface PhaseButtonProps {
   turnPhase: TurnPhase;
@@ -16,13 +17,14 @@ function PhaseButton({
   handleConfirmUse,
   handleConfirmBuy,
 }: PhaseButtonProps) {
+  const { t } = useLanguage();
   return (
     <>
       {turnPhase === 'use' ? (
         <FloatingButton
           icon='→'
-          label='Confirm Use'
-          ariaLabel='Confirm use action'
+          label={t('confirmUse')}
+          ariaLabel={t('confirmUseAria')}
           disabled={!hasStaged}
           onClick={handleConfirmUse}
           position='bottom-right'
@@ -31,8 +33,8 @@ function PhaseButton({
       ) : (
         <FloatingButton
           icon='✓'
-          label='Confirm Buy'
-          ariaLabel='Confirm buy action'
+          label={t('confirmBuy')}
+          ariaLabel={t('confirmBuyAria')}
           disabled={bought === null}
           onClick={handleConfirmBuy}
           position='bottom-right'

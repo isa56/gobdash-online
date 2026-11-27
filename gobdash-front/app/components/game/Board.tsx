@@ -7,15 +7,17 @@ import FoodModal from './board/FoodModal';
 import { publicAssetPath } from '~/lib/assets';
 import type { BoardSpace, PantryFood } from '~/types/game';
 import { useGameStore } from '~/store/gameStore';
+import { useLanguage, type TranslationKey } from '~/lib/i18n';
+import { getIngredientLabel } from '~/lib/i18n';
 
-const BOARD_SPACES = {
-  pantry: 'Pantry',
-  stove: 'Stove',
-  countertop: 'Countertop',
-  salon: 'Salon',
-  delivery: 'Delivery',
-  leftHand: 'Left Hand',
-  rightHand: 'Right Hand',
+const BOARD_SPACES: Record<BoardSpace, TranslationKey> = {
+  pantry: 'pantry',
+  stove: 'stove',
+  countertop: 'countertop',
+  salon: 'salon',
+  delivery: 'delivery',
+  leftHand: 'leftHand',
+  rightHand: 'rightHand',
 } as const;
 
 type BoardSpaceName = keyof typeof BOARD_SPACES;
@@ -58,6 +60,7 @@ function BoardDropZone({
   onAddFood,
   onPrepareFood,
 }: BoardDropZoneProps) {
+  const { t } = useLanguage();
   const isHand = id === 'leftHand' || id === 'rightHand';
   const { ref, isDropTarget } = useDroppable({
     id: `board-space-${id}`,
@@ -78,8 +81,8 @@ function BoardDropZone({
       role={selection ? 'button' : 'group'}
       tabIndex={selection ? 0 : undefined}
       aria-label={selection
-        ? `Move selected object to ${BOARD_SPACES[id]}`
-        : BOARD_SPACES[id]}
+        ? t('moveSelectedObject', { space: t(BOARD_SPACES[id]) })
+        : t(BOARD_SPACES[id])}
       onClick={selectOrMove}
       onKeyDown={(event) => {
         if (selection && (event.key === 'Enter' || event.key === ' ')) {
@@ -126,13 +129,13 @@ function BoardDropZone({
             event.stopPropagation();
             onAddFood();
           }}
-          aria-label='Choose a food token for the pantry'
+          aria-label={t('chooseFoodForPantry')}
           className='absolute left-[-60%] flex h-10 w-10 items-center justify-center rounded-full border-2 border-amber-200 bg-fern text-xl font-bold text-white shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-300'>
           +
         </button>
       ) : null}
       <span className='pointer-events-none absolute -bottom-5 whitespace-nowrap rounded-md bg-stone-950/80 px-2 py-0.5 text-2xs font-semibold uppercase tracking-wide text-amber-100'>
-        {BOARD_SPACES[id]}
+        {t(BOARD_SPACES[id])}
       </span>
       {isDropTarget && !gobPosition ? (
         <div className='absolute -inset-1 scale-110 rounded-full border-2 border-solid border-amber-200 bg-amber-300/20' />
@@ -142,6 +145,7 @@ function BoardDropZone({
 }
 
 function Board() {
+  const { t } = useLanguage();
   const gobSpace = useGameStore((state) => state.gobSpace);
   const foodPositions = useGameStore((state) => state.foodPositions);
   const foodTokens = useGameStore((state) => state.foodTokens);
@@ -191,8 +195,8 @@ function Board() {
           }}>
           <p className='sr-only' aria-live='polite'>
             {selection
-              ? 'Object selected. Choose a destination area.'
-              : 'No object selected.'}
+              ? t('objectSelected')
+              : t('noObjectSelected')}
           </p>
           {(Object.keys(BOARD_SPACES) as BoardSpaceName[]).map((space) => (
             <BoardDropZone
@@ -240,7 +244,7 @@ function Board() {
               <div className='h-12 w-12 rotate-3 drop-shadow-2xl'>
                 <img
                   src={publicAssetPath(draggedFood.food.image)}
-                  alt={draggedFood.food.name}
+                  alt={getIngredientLabel(draggedFood.food.name, t)}
                   className='h-full w-full rounded-full border border-amber-100 object-cover'
                 />
               </div>

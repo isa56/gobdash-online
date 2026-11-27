@@ -15,8 +15,10 @@ import CodeTokenContainer from '~/components/game/cardTable/CodeTokenContainer';
 import Card from '~/components/game/cardTable/Card';
 import type { CodeTokenType } from '~/components/game/cardTable/CodeToken';
 import { useGameState } from '~/hooks/useGameState';
+import { getCardLabel, useLanguage } from '~/lib/i18n';
 
 function CardHand() {
+  const { t } = useLanguage();
   const {
     hand,
     cardTableCards,
@@ -86,10 +88,17 @@ function CardHand() {
         }}>
         <p className='sr-only' aria-live='polite'>
           {selectedCard
-            ? `Card ${selectedCard.type} selected. Choose a destination.`
+            ? t('selectedCardDestination', {
+                card: getCardLabel(selectedCard.type, t),
+              })
             : selectedToken
-              ? `${selectedToken} token selected. Choose a card slot.`
-              : 'No draggable object selected.'}
+              ? t('selectedTokenDestination', {
+                  token:
+                    selectedToken === 'program'
+                      ? t('codeToken')
+                      : t('errorToken'),
+                })
+              : t('noDraggableSelected')}
         </p>
         {/* Card Deck + Discard Pile */}
         <div className='flex justify-center items-top gap-4 mb-4'>
@@ -161,7 +170,7 @@ function CardHand() {
           {/* Code Token Tray */}
           <div className='flex flex-col items-center justify-center p-3 rounded-2xl bg-stone-900/60 border border-stone-800/80 shadow-md backdrop-blur-xs shrink-0 min-w-[140px]'>
             <p className='text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2'>
-              Tokens
+              {t('tokens')}
             </p>
             <CodeTokenContainer
               placedTokens={{
