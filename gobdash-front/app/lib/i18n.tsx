@@ -21,6 +21,9 @@ const translations = {
     unableToCreateRoom: 'Unable to create room.',
     unableToJoinRoom: 'Unable to join room.',
     playingGobDash: 'Playing GobDash',
+    howToPlay: 'How to Play',
+    howToPlayDescription:
+      '<p class="mb-3"><strong>Goal:</strong> Help Gob, the goblin chef, prepare the dishes chosen by the restaurant’s customers.</p><p class="mb-2"><strong>Setup:</strong></p><ul class="mb-3 list-disc space-y-1 pl-5"><li>Set up the board, decks, and tokens; place Gob in the center.</li><li>Deal 5 Action cards to each player, choose the first player (play proceeds clockwise), and draw the Recipe card for this round.</li></ul><p class="mb-2"><strong>Planning phase:</strong></p><ul class="mb-3 list-disc space-y-1 pl-5"><li>On your turn, choose one card from your hand: add it to the program on the table (shifting the cards to its right forward one space) or discard it. Draw a card at the end of your turn.</li><li>Don’t reveal your hand. You may signal what you intend to do without speaking.</li><li>Once every player has taken at least one turn, the group decides when the program is ready to execute.</li></ul><p class="mb-2"><strong>Execution phase:</strong> Choose a player to follow the program step by step, moving Gob and the Program Counter and placing items in their proper locations.</p><p class="mb-2"><strong>Debugging phase:</strong> If an error is found, mark where it was first noticed with the Error token. Return all ingredients to the pantry and Gob to the starting circle; put the cards after the error at the bottom of the deck. Resume planning from where you stopped, then execute the program again. Keep track of how many times you debugged each recipe. If no problems are found, the group wins the round.</p>',
     gameDescription: 'Game',
     connectionFailed: 'Connection to the game server failed.',
     useCard: '1. Use a card',
@@ -139,6 +142,9 @@ const translations = {
     unableToCreateRoom: 'Não foi possível criar a sala.',
     unableToJoinRoom: 'Não foi possível entrar na sala.',
     playingGobDash: 'Jogando GobDash',
+    howToPlay: 'Como Jogar',
+    howToPlayDescription:
+      '<p class="mb-3"><strong>Objetivo:</strong> Ajudar Gob, o goblin cozinheiro, a preparar os pratos escolhidos pelos clientes do restaurante.</p><p class="mb-2"><strong>Preparação:</strong></p><ul class="mb-3 list-disc space-y-1 pl-5"><li>Prepare o tabuleiro, os baralhos e os marcadores; posicione Gob no centro.</li><li>Distribua 5 cartas de Ação para cada jogador, escolha quem começa (o jogo segue em sentido horário) e compre a carta de Receita da rodada.</li></ul><p class="mb-2"><strong>Fase de sequência:</strong></p><ul class="mb-3 list-disc space-y-1 pl-5"><li>No seu turno, escolha uma carta da mão: coloque-a na sequência da mesa (movendo as cartas à direita uma posição para a frente) ou descarte-a. Compre uma carta ao final do turno.</li><li>Não revele suas cartas. Você pode indicar o que pretende fazer sem falar.</li><li>Quando todos tiverem jogado pelo menos uma vez, o grupo decide quando a sequência está pronta para ser executada.</li></ul><p class="mb-2"><strong>Fase de execução:</strong> Escolha um jogador para seguir a sequência passo a passo, movimentando Gob e o Contador de Programa e colocando os itens nos locais corretos.</p><p class="mb-2"><strong>Fase de depuração:</strong> Se encontrarem um erro, marquem com o Token de Erro o local onde ele foi percebido primeiro. Devolvam todos os ingredientes à despensa e Gob ao círculo inicial; coloquem no fundo do baralho as cartas que vêm depois do erro. Retomem a fase de sequência de onde pararam e executem novamente. Anotem quantas vezes foi preciso depurar cada receita. Se nenhum problema for encontrado, o grupo vence a rodada.</p>',
     gameDescription: 'Partida',
     connectionFailed: 'Falha ao conectar ao servidor do jogo.',
     useCard: '1. Use uma carta',
@@ -163,7 +169,8 @@ const translations = {
     closeFoodChooser: 'Fechar seleção de alimentos',
     addFoodToPantry: 'Adicionar {food} à despensa',
     selectedCardDestination: 'Carta {card} selecionada. Escolha um destino.',
-    selectedTokenDestination: 'Marcador {token} selecionado. Escolha uma carta.',
+    selectedTokenDestination:
+      'Marcador {token} selecionado. Escolha uma carta.',
     noDraggableSelected: 'Nenhum item arrastável selecionado.',
     tokens: 'Marcadores',
     hand: 'Mão',
@@ -248,10 +255,7 @@ export type TranslationKey = keyof typeof translations.en;
 type LanguageContextValue = {
   language: Language;
   setLanguage: (language: Language) => void;
-  t: (
-    key: TranslationKey,
-    values?: Record<string, string | number>,
-  ) => string;
+  t: (key: TranslationKey, values?: Record<string, string | number>) => string;
 };
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);

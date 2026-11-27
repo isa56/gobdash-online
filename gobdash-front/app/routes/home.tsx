@@ -33,7 +33,9 @@ export default function Home() {
       setPlayerId(playerId);
       navigate(`/game/${roomId}`);
     } catch (error: unknown) {
-      setErrorMessage(error instanceof Error ? error.message : t('unableToCreateRoom'));
+      setErrorMessage(
+        error instanceof Error ? error.message : t('unableToCreateRoom'),
+      );
     } finally {
       setIsCreating(false);
     }
@@ -51,14 +53,16 @@ export default function Home() {
       setPlayerId(playerId);
       navigate(`/game/${roomId}`);
     } catch (error: unknown) {
-      setErrorMessage(error instanceof Error ? error.message : t('unableToJoinRoom'));
+      setErrorMessage(
+        error instanceof Error ? error.message : t('unableToJoinRoom'),
+      );
     } finally {
       setIsJoining(false);
     }
   }
 
   return (
-    <div className='flex flex-col items-center justify-center gap-4 w-full h-full max-w-md mx-auto p-4'>
+    <div className='flex flex-col items-center justify-center gap-4 w-full h-full max-w-2xl mx-auto p-4'>
       <div className='self-end'>
         <LanguageSelector />
       </div>
@@ -97,7 +101,9 @@ export default function Home() {
 
         <div className='flex items-center gap-2 w-full my-2 text-stone-400'>
           <div className='flex-1 h-px bg-stone-600' />
-          <span className='text-xs uppercase tracking-wider font-semibold'>{t('orJoinWithCode')}</span>
+          <span className='text-xs uppercase tracking-wider font-semibold'>
+            {t('orJoinWithCode')}
+          </span>
           <div className='flex-1 h-px bg-stone-600' />
         </div>
 
@@ -117,6 +123,15 @@ export default function Home() {
           </button>
         </form>
       </div>
+
+      {/* How to Play */}
+      <div className='w-full mt-8 mb-4 p-6 bg-espresso/70 rounded-xl border border-stone-700 shadow-xl'>
+        <h2 className='text-xl font-bold text-white mb-2'>{t('howToPlay')}</h2>
+        <div
+          className='text-stone-300 columns-1 md:columns-2 gap-6'
+          dangerouslySetInnerHTML={{ __html: t('howToPlayDescription') }}></div>
+      </div>
+
       <div className='fixed bottom-4 right-4 z-50'>
         <ToastComponent
           text={errorMessage ?? ''}
