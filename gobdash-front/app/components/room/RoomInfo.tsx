@@ -37,9 +37,6 @@ export default function RoomInfo({
 
   return (
     <div className='flex items-center justify-between w-full h-full'>
-      <div className='ml-3'>
-        <LanguageSelector />
-      </div>
       <NavLink
         to='/'
         className='flex text-white ml-4 items-center justify-center gap-2 bg-espresso/75 p-4 rounded-4xl cursor-pointer hover:bg-espresso-dark'>
@@ -81,7 +78,12 @@ export default function RoomInfo({
         <p className='text-sm text-white'>
           {t('playerTurn', { player: turnNumber % numberOfPlayers })}
         </p>
-        <p className='text-sm text-white'>{t('turnNumber', { number: turnNumber })}</p>
+        <p className='text-sm text-white'>
+          {t('turnNumber', { number: turnNumber })}
+        </p>
+        <div className='ml-3'>
+          <LanguageSelector />
+        </div>
       </div>
 
       <div className='fixed bottom-4 right-4 z-50'>
